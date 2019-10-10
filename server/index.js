@@ -2,7 +2,7 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const colyseus = require('colyseus');
-const MyRoom = require('./MyRoom').MyRoom;
+const { Room } = require('./Room');
 
 const app = express();
 app.use(cors());
@@ -14,9 +14,9 @@ const gameServer = new colyseus.Server({
   express: app,
 });
 
-// register your room handlers
-gameServer.define('room', MyRoom);
+// register room handlers
+gameServer.define('room', Room);
 
-const port = process.env.PORT || 2048;
+const port = process.env.PORT || 2052;
 gameServer.listen(port);
 console.log(`Listening on ws://localhost:${port}`)
