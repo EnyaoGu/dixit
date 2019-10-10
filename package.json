@@ -8,14 +8,25 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "react": "16.8.0",
+    "react-dom": "16.8.0",
     "@colyseus/loadtest": "^0.11.0"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0-rc.1",
+    "@babel/preset-react": "^7.0.0-rc.1",
     "@colyseus/monitor": "^0.11.0",
     "@colyseus/social": "^0.10.2",
     "colyseus": "^0.11.0",
+    "colyseus.js": "^0.11.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "express-jwt": "^5.3.1"
+    "express-jwt": "^5.3.1",
+    "style-loader": "^0.20.3",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.1.9"
   }
 }

@@ -2,14 +2,9 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const colyseus = require('colyseus');
-const monitor = require("@colyseus/monitor").monitor;
-const socialRoutes = require("@colyseus/social/express").default;
-
 const MyRoom = require('./MyRoom').MyRoom;
 
-const port = process.env.PORT || 2567;
-const app = express()
-
+const app = express();
 app.use(cors());
 app.use(express.json());
 
@@ -20,13 +15,8 @@ const gameServer = new colyseus.Server({
 });
 
 // register your room handlers
-gameServer.define('my_room', MyRoom);
+gameServer.define('room', MyRoom);
 
-// register @colyseus/social routes
-app.use("/", socialRoutes);
-
-// register colyseus monitor AFTER registering your room handlers
-app.use("/colyseus", monitor(gameServer));
-
+const port = process.env.PORT || 2048;
 gameServer.listen(port);
-console.log(`Listening on ws://localhost:${ port }`)
+console.log(`Listening on ws://localhost:${port}`)

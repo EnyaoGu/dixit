@@ -1,6 +1,6 @@
 const colyseus = require('colyseus');
 
-exports.MyRoom = class extends colyseus.Room {
+exports.Room = class extends colyseus.Room {
 
   onCreate (options) {
   }
