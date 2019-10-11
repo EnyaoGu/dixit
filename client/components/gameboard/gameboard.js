@@ -5,14 +5,14 @@ import './gameboard.css';
 
 const noPlayerItem = (key) => <div className='score-item no-player' key={key}>No Player</div>;
 
-const GAMEBOARD = ({ gameState, myName }) => {
+const GAMEBOARD = ({ gameState, myId }) => {
   const scoreItems = gameState.players.map((player, index) => {
     const classNames = ['score-item'];
     const scoreItem = gameState.score.find((p_scoreItem) => p_scoreItem.playerId === player.id);
 
     if (!player.name) { return noPlayerItem(index); }
 
-    if (player.name === myName) {
+    if (player.id === myId) {
       classNames.push('is-me');
     }
 
@@ -39,7 +39,7 @@ const GAMEBOARD = ({ gameState, myName }) => {
 
 GAMEBOARD.propTypes = {
   gameState: PropTypes.object.isRequired,
-  myName: PropTypes.string.isRequired,
+  myId: PropTypes.string.isRequired,
 };
 
 export default GAMEBOARD;
