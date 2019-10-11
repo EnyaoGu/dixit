@@ -30,25 +30,11 @@ exports.Room = class extends colyseus.Room {
   }
 
   onJoin (client, options) {
-<<<<<<< HEAD
-    this.state.players.push({
-      id: client.id,
-      name: options.name,
-      isTeller: this._assignTeller(),
-      holdingCards: [],
-      usingCard: '',
-      voteCard: '',
-      hasBeenTellerForTimes: 0,
-      score: 0,
-      roundScore:0,
-    });
-=======
     const newPlayer = new PlayerState();
     newPlayer.id = client.id;
     newPlayer.name = options.name;
     newPlayer.isTeller = this.assignTeller();
     this.state.players.push(newPlayer);
->>>>>>> origin/master
 
     if(this.clients.length === this.maxClients)
     {
