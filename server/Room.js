@@ -34,8 +34,8 @@ exports.Room = class extends colyseus.Room {
     const newPlayer = new PlayerState();
     newPlayer.id = client.id;
     newPlayer.name = options.name;
-    newPlayer.isTeller = this.assignTeller();
-    if (newPlayer.isTeller = this.assignTeller()) {
+    newPlayer.isTeller = this._assignTeller();
+    if (newPlayer.isTeller = this._assignTeller()) {
       newPlayer.hasBeenTellerForTimes +1;
     }
     this.state.players.push(newPlayer);
