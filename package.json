@@ -20,7 +20,8 @@
     "style-loader": "^0.20.3",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
-    "webpack-dev-server": "^3.1.9"
+    "webpack-dev-server": "^3.1.9",
+    "antd": "^3.23.6"
   },
   "dependencies": {
     "@babel/cli": "7.1.0",
