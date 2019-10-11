@@ -54,6 +54,7 @@ RoomState:
     })
 }
 ```
+
 Message from client to server
 ```js
 msg = {
