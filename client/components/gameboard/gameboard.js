@@ -6,9 +6,8 @@ import './gameboard.css';
 
 const noPlayerItem = (key) => <div className='score-item no-player' key={key}>No Player</div>;
 
-const GAMEBOARD = ({ gameState, myId }) => {
-  let iAmTeller = false;
-  const scoreItems = gameState.players.map((player, index) => {
+const listScoreItems = (players, myId) => {
+  const scoreItems = players.map((player, index) => {
     const classNames = ['score-item'];
 
     if (!player.name) { return noPlayerItem(index); }
@@ -21,10 +20,6 @@ const GAMEBOARD = ({ gameState, myId }) => {
       classNames.push('is-teller');
     }
 
-    if (player.id === myId && player.isTeller) {
-      iAmTeller = true;
-    }
-
     return <div className={classNames.join(' ')} key={index}>
       {player.name}: {player.score}{player.roundScore ? `(+${player.roundScore})`: ''}
     </div>
@@ -33,12 +28,30 @@ const GAMEBOARD = ({ gameState, myId }) => {
   while (scoreItems.length < 4) {
     scoreItems.push(noPlayerItem(scoreItems.length));
   }
+  return scoreItems;
+};
+
+const fakeGameState = {
+  players: [
+    { id: '1', name: 'Enyao', isTeller: true, score: 12, roundScore: 0 },
+    { id: '2', name: 'John', score: 7, roundScore: 1 },
+    { id: '3', name: '', score: 0, roundScore: 0},
+  ],
+};
+
+const GAMEBOARD = ({ room }) => {
+  // const [ gameState, setGameState ] = useState(fakeGameState);
+  const [ gameState, setGameState ] = useState(room.state.toJSON());
+  room.onStateChange(() => setGameState(room.state.toJSON()));
+
+  const myId = room.sessionId;
+  const myState = gameState.players.find((player) => player.id === myId);
 
   return <div className='gameboard-wrapper'>
-    <div id='scoreboard'>{scoreItems}</div>
+    <div id='scoreboard'>{listScoreItems(gameState.players, myId)}</div>
     <CARDSELECTION
         cards={['../../resources/1.png', '../../resources/2.png', '../../resources/3.png', '../../resources/4.png', '../../resources/5.png']}
-        pageType={iAmTeller ? PageType.tellerEnterDescription : PageType.playerWaiting}
+        pageType={myState && myState.isTeller ? PageType.tellerEnterDescription : PageType.playerWaiting}
         onCardSelected={(p_cardSelected, p_cardDescription) => {
           window.console.log(`${p_cardSelected} is selected`);
           if (p_cardDescription) {
@@ -50,8 +63,7 @@ const GAMEBOARD = ({ gameState, myId }) => {
 };
 
 GAMEBOARD.propTypes = {
-  gameState: PropTypes.object.isRequired,
-  myId: PropTypes.string.isRequired,
+  room: PropTypes.object.isRequired,
 };
 
 export default GAMEBOARD;
