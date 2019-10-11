@@ -50,7 +50,7 @@ RoomState:
         score,
         roundScore,
       }],
-      theWord, 
+      theWord,
     })
 }
 ```
