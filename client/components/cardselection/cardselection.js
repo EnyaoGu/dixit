@@ -16,9 +16,7 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
 
     const items = [];
     for (const [index, value] of cards.entries()) {
-        items.push(<div>
-            <Card cover={<img src={value} />}/>
-        </div>);
+        items.push(<Card key={index} cover={<img src={value} />}/>);
     }
 
     return <>
