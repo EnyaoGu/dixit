@@ -7,6 +7,7 @@ class PlayerState extends Schema {
     super();
 
     this.holdingCards = new ArraySchema();
+    this.voter = new ArraySchema();
   }
 }
 schema.defineTypes(PlayerState, {
@@ -17,6 +18,7 @@ schema.defineTypes(PlayerState, {
   usingCard: 'string',
   voteCard: 'string',
   hasBeenTellerForTimes: 'number',
+  voters: ['string'],
   score: 'number',
   roundScore: 'number',
 });

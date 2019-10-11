@@ -5,7 +5,7 @@ exports.Cards = class Cards {
     }
 
     deliverCards(room){
-        room.players.forEach(player => {
+        room.state.players.forEach(player => {
             if(this.lib.length >= room.maxClients*5)
             {
                 player.holdingCards = this.cardsOneShare(this.lib, 5);
@@ -18,7 +18,7 @@ exports.Cards = class Cards {
     }
 
     replenishCard(room){
-        room.players.forEach(player => {
+        room.state.players.forEach(player => {
             if(this.lib.length > room.maxClients)
             {
                 player.holdingCards = this.cardsOneShare(this.lib, 1);
@@ -43,7 +43,7 @@ exports.Cards = class Cards {
         var cardsOneShare = [];
         if(number >0)
         {
-                for(var i =0; i< number; i++)
+            for(var i =0; i< number; i++)
             {
                 var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
                 cardsOneShare.push(cardLib[index]);
