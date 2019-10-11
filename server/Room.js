@@ -102,7 +102,7 @@ exports.Room = class extends colyseus.Room {
         currentPlayer.votedCard = message.votedCard;
 
         // if all players votes
-        if (this.state.players.some(function (player) {return player.votedCard == undefined;}) === false) {
+        if (this.state.players.some(function (player) {return player.votedCard === undefined;}) === false) {
           this.state.gamePhase = GamePhase.GameResult;
           this.state.players.forEach(player => {
             player.isReady = false;
