@@ -113,10 +113,10 @@ exports.Room = class extends colyseus.Room {
             player.isReady = false;
           });
         }
-        break;
-
+        
         this._scoreCalculator();
         this.GamePhase = GamePhase.GameResult;
+        break;
 
       case GamePhase.GameResult:
         // Now we'll decide whether to start a new round
