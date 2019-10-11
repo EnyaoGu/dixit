@@ -34,7 +34,10 @@ exports.Room = class extends colyseus.Room {
     const newPlayer = new PlayerState();
     newPlayer.id = client.id;
     newPlayer.name = options.name;
-    newPlayer.isTeller = this._assignTeller();
+    newPlayer.isTeller = this.assignTeller();
+    if (newPlayer.isTeller = this.assignTeller()) {
+      newPlayer.hasBeenTellerForTimes +1;
+    }
     this.state.players.push(newPlayer);
 
     if(this.clients.length === this.maxClients)
@@ -51,7 +54,6 @@ exports.Room = class extends colyseus.Room {
     var currentPlayer = this._getPlayerById(client.id);
 
     switch (this.state.GamePhase) {
-
       case GamePhase.TellerSelectingCard:
         this._isMessageValid(true, MessageType.TellerSelectsWord);
         if (!message.selectedCard || !message.selectedWord) {
@@ -100,6 +102,9 @@ exports.Room = class extends colyseus.Room {
           return;
         }
         currentPlayer.votedCard = message.votedCard;
+        // find owner and add voter
+        var owner = this._findCardOwner(currentPlayer.votedCard);
+        owner.voters.push(currentPlayer.id);
 
         // if all players votes
         if (this.state.players.some(function (player) {return player.votedCard === undefined;}) === false) {
@@ -109,6 +114,9 @@ exports.Room = class extends colyseus.Room {
           });
         }
         break;
+
+        this._scoreCalculator();
+        this.GamePhase = GamePhase.GameResult;
 
       case GamePhase.GameResult:
         // Now we'll decide whether to start a new round
@@ -184,8 +192,49 @@ exports.Room = class extends colyseus.Room {
     return true;
   }
 
-  _initNextRound(){
-    this.players.forEach(player => {
+  _findCardOwner(card)
+  {
+    return this.state.palyers.find(function (player) {
+      return player.holdingCards.includes(card);
+    });
+  }
+
+  _scoreCalculator() {
+    var host = this.state.players.find(function (player){
+      return player.isTeller === true;
+    });
+    var guests = this.state.players.splice(this.state.players.indexOf(host),1);
+    var hostVote = host.voters.length;
+
+    if (hostVote === 0 || hostVote === 3){
+      host.roundScore = 0;
+      guests.forEach(guest =>{
+        guest.roundScore = 2;
+      });
+      roundScore = 2;
+    }
+    else{
+      host.roundScore = hostVote * 3;
+
+      host.voters.forEach(voter => {
+        var player = this._getPlayerById(voter);
+        player.roundScore = 3;
+      });
+    }
+
+    guests.forEach(guest =>{
+      if (owner = this._findCardOwner(guest.votedCard) != host){
+        owner.roundScore + 1;
+      }
+    });
+
+    this.state.players.forEach(player =>{
+      player.score += player.roundScore;
+    });
+  }
+
+  _initNextRound() {
+    this.state.players.forEach(player => {
       player.isTeller = false;
       player.holdingCards = [];
       player.usingCard = undefined;

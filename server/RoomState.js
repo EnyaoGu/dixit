@@ -10,6 +10,7 @@ class PlayerState extends Schema {
     this.name = '';
     this.isTeller = false;
     this.holdingCards = new ArraySchema();
+    this.voters = new ArraySchema();
     this.usingCard = '';
     this.voteCard = '';
     this.hasBeenTellerForTimes = 0;
@@ -25,6 +26,7 @@ schema.defineTypes(PlayerState, {
   usingCard: 'string',
   voteCard: 'string',
   hasBeenTellerForTimes: 'number',
+  voters: ['string'],
   score: 'number',
   roundScore: 'number',
   isReady: 'boolean',
