@@ -62,6 +62,6 @@ Message from client to server
 msg = {
     string messageType = Room.MessageType.xxx,
     string selectedCard = Cards.CardIds.xxx,
-    string selectedWord = "the word"};
+    string theWord = "the word"};
     string votedCard = Cards.CardIds.xxx}
 ```
