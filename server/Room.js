@@ -14,7 +14,8 @@ const GamePhase = {
 const MessageType = {
    TellerSelectsWord : 'TellerSelectsWord',
    PlayerSelectsCard : 'PlayerSelectsCard',
-   PlayerVotes : 'PlayerVotes'
+   PlayerVotes : 'PlayerVotes',
+   ReadyForNextTurn : 'ReadyForNextTurn',
 }
 
 exports.Room = class extends colyseus.Room {
@@ -56,10 +57,10 @@ exports.Room = class extends colyseus.Room {
           console.warn('Message invalid.')
           return;
         }
+
         if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) == false) {
           return;
         }
-
         this.state.theWord = message.theWord;
         this.state.gamePhase = GamePhase.PlayersSelectingCards;
         console.log('teller tells!');
@@ -86,10 +87,21 @@ exports.Room = class extends colyseus.Room {
         break;
       
       case GamePhase.Voting:
-        this._isMessageValid(undefined, MessageType.PlayerVotes);
+        // host cannot vote.
+        this._isMessageValid(false, MessageType.PlayerVotes);
         if (!message.votedCard) {
           console.warn('invalid vote.');
           return;
+        }
+        if (message.votedCard === currentPlayer.selectedCard) {
+          console.warn('you cannot vote yourself.');
+          return;
+        }
+        currentPlayer.votedCard = message.votedCard;
+
+        // if all players votes
+        if (this.state.players.some(function (player) {return player.votedCard == undefined;}) == false) {
+          this.state.gamePhase = this.gamePhase.GameResult;
         }
 
       case GamePhase.GameResult:
@@ -110,13 +122,13 @@ exports.Room = class extends colyseus.Room {
 
   _SetUsingCardAndSplice(currentPlayer, selectedCard)
   {
-    var index = currentPlayer.indexOf(selectedCard);
+    var index = currentPlayer.holdingCards.indexOf(selectedCard);
     if (index === -1)
     {
       console.warn('you cannot choose a card you dont have.');
       return false;
     }
-    currentPlayer.holdingCards.splice(index);
+    currentPlayer.holdingCards.splice(index, 1);
     currentPlayer.usingCard = selectedCard;
   }
 
