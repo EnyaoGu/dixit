@@ -32,7 +32,7 @@ exports.Room = class extends colyseus.Room {
     this.state.players.push({
       id: client.id,
       name: options.name,
-      isTeller: this.assignTeller(),
+      isTeller: this._assignTeller(),
       holdingCards: [],
       usingCard: '',
       voteCard: '',
@@ -55,7 +55,7 @@ exports.Room = class extends colyseus.Room {
     if (this.locked === false) {
       console.warn('why do we get messages when the room is not locked?'); 
     }
-    var currentPlayer = this.getPlayerById(client.id);
+    var currentPlayer = this._getPlayerById(client.id);
 
     switch (this.state.GamePhase) {
       case GamePhase.TellerSelectingCard:
@@ -84,6 +84,11 @@ exports.Room = class extends colyseus.Room {
       
       case GamePhase.Voting:
         break;
+
+      case GamePhase.Result:
+        if (message.MessageType === MessageType.)
+        break;
+
       default:
         break;
     }
@@ -104,7 +109,7 @@ exports.Room = class extends colyseus.Room {
     });
   }
 
-  assignTeller() {
+  _assignTeller() {
     return this.clients.length === 1;
   }
 }

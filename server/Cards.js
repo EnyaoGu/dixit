@@ -1,22 +1,37 @@
 exports.Cards = class Cards {
     constructor() {
         this.capacity = 80;
-        this.lib = genCardLib(this.capacity);
+        this.lib = this.genCardLib(this.capacity);
     }
 
     deliverCards(room){
-        var cardLib = this.lib;
         room.players.forEach(player => {
-            player.holdingCards = cardsOneShare(cardLib);
+            if(this.lib.length >= room.maxClients*5)
+            {
+                player.holdingCards = this.cardsOneShare(this.lib, 5);
+            }
+            else
+            {
+                console.warn("We don't have enough cards for all players.");
+            }
         });
     }
 
-    selectCard(room, playerId){
-        
+    replenishCard(room){
+        room.players.forEach(player => {
+            if(this.lib.length > room.maxClients)
+            {
+                player.holdingCards = this.cardsOneShare(this.lib, 1);
+            }
+            else
+            {
+                console.warn("We are out of cards! Start a new game.");
+            }
+        });
     }
 
     genCardLib(capacity){
-        var cardLib = new Array();
+        var cardLib = [];
         for(var i=1;i<= capacity;i++)
         {
             cardLib.push(i.toString());
@@ -24,14 +39,17 @@ exports.Cards = class Cards {
         return cardLib;
     }
 
-    cardsOneShare(cardLib){
+    cardsOneShare(cardLib, number){
         var cardsOneShare = [];
-        for(var i =0; i<5; i++)
+        if(number >0)
         {
-            var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
-            cardsOneShare.push(cardLib[index]);
-            // cardLib.pop(tag);
+                for(var i =0; i< number; i++)
+            {
+                var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
+                cardsOneShare.push(cardLib[index]);
+                cardLib.splice(index,1);
+            }
+            return cardsOneShare;
         }
-        return cardsOneShare;
     }
 }
