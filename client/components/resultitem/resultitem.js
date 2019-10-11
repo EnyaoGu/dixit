@@ -5,16 +5,15 @@ import PropTypes from 'prop-types';
 import './resultitem.css';
 
 const RESULTITEM = ({ card }) => {
-    const items = [];
-    for (const [index, value] of card.voters.entries()) {
-        items.push(<li key={index}>{value}</li>);
-    }
+	const items = card.voters.map((value, index) =>
+		<li key={index}>{value}</li>
+	);
 
     return <>
-        <Card style={{ width: 156, margin: 2+'px' }} bordered={false} cover={<img src={card.src} />}>
-            <ol>
+        <Card style={{ width: 140, backgroundColor: 'lightcyan'}} bordered={false} cover={<img src={card.src} />}>
+            <ul>
                 {items}
-            </ol>
+            </ul>
         </Card>
     </>;
 };

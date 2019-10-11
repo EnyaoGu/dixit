@@ -11,11 +11,11 @@ const RESULT = ({ cards }) => {
             <Card bordered={false} ><p>Description.</p></Card>
         </div>
         <div>
-            <div style={{display:"flex",flexDirection:"row"}}>
+            <div className={'result-item-wrapper'}>
                 <RESULTITEM card={cards[0]} />
                 <RESULTITEM card={cards[1]} />
             </div>
-            <div style={{display:"flex",flexDirection:"row"}}>
+            <div className={'result-item-wrapper'}>
                 <RESULTITEM card={cards[2]}></RESULTITEM>
                 <RESULTITEM card={cards[3]}></RESULTITEM>
             </div>
