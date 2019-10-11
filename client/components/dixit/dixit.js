@@ -24,17 +24,16 @@ const fakeGameState = {
 
 const DIXIT = ({}) => {
   const [room, setRoom] = useState(undefined);
-  const [myName, setMyName] = useState('');
+  const [myId, setMyId] = useState('2');
 
   return <>{
     room
     ? <GAMEBOARD
       gameState={fakeGameState}
-      myName={myName}
+      myId={myId}
     />
     : <LOGIN
       onConfirm={(p_userName) => {
-        setMyName(p_userName);
         setRoom(true);
       }}
     />
