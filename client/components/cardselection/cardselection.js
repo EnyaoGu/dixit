@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Button, Card, Carousel, Input } from 'antd';
 import 'antd/dist/antd.css';
 import PropTypes from 'prop-types';
-import './selectCards.css';
+import './cardselection.css';
 
-const SELECTCARDS = ({ cards, onCardSelected }) => {
+const CARDSELECTION = ({ cards, onCardSelected }) => {
     const [cardDescription, setCardDescription] = useState('');
     const [cardSelected, setCardSelected] = useState('');
 
@@ -47,9 +47,9 @@ const SELECTCARDS = ({ cards, onCardSelected }) => {
         </>;
 };
 
-SELECTCARDS.propTypes = {
+CARDSELECTION.propTypes = {
     cards: PropTypes.array.isRequired,
     onCardSelected: PropTypes.func.isRequired,
 };
 
-export default SELECTCARDS;
+export default CARDSELECTION;
