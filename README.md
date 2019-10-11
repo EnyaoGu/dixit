@@ -46,17 +46,15 @@ RoomState:
         holdingCards,
         usingCard,
         voteCard,
-        hasBeenTellerForTimes
-      }],
-      theWord, 
-      score: [{
-        playerName,
+        hasBeenTellerForTimes,
         score,
         roundScore,
       }],
+      theWord, 
     })
 }
 ```
+
 Message from client to server
 ```js
 msg = {

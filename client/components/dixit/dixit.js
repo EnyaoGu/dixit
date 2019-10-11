@@ -10,16 +10,10 @@ window.tempClient = client;
 // For dev
 const fakeGameState = {
   players: [
-    { id: '1', name: 'Enyao', isTeller: true },
-    { id: '2', name: 'John' },
-    { id: '3', name: '' },
+    { id: '1', name: 'Enyao', isTeller: true, score: 12, roundScore: 0 },
+    { id: '2', name: 'John', score: 7, roundScore: 1 },
+    { id: '3', name: '', score: 0, roundScore: 0},
   ],
-  score:[
-    { playerId: '1', score: 12, roundScore: 0 },
-    { playerId: '2', score: 7, roundScore: 1 },
-    { playerId: '3', score: 0, roundScore: 0 },
-    { playerId: '4', score: 0, roundScore: 0 },
-  ]
 };
 
 const DIXIT = ({}) => {
