@@ -1,7 +1,7 @@
 exports.Cards = class Cards {
     constructor() {
         this.capacity = 80;
-        this.lib = genCardLib(this.capacity);
+        this.lib = this.genCardLib(this.capacity);
     }
 
     deliverCards(room){
