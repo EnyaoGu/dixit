@@ -31,7 +31,8 @@ const DIXIT = ({}) => {
     onConfirm={(p_userName) => {
       setLogin(false);
       client.joinOrCreate('room', { name: p_userName })
-        .then((p_room) => setRoom(p_room));
+        .then((p_room) => setRoom(p_room))
+        .catch(() => setLogin(true));
     }}
     />
     : room
@@ -39,7 +40,7 @@ const DIXIT = ({}) => {
       gameState={fakeGameState}
       myId={myId}
     />
-    : <div class='waiting-spin-overlay'><Spin /></div>
+    : <div className='waiting-spin-overlay'><Spin /></div>
   }</>;
 };
 
