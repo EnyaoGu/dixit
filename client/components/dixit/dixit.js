@@ -6,9 +6,9 @@ import GAMEBOARD from '../gameboard/gameboard';
 import { Spin } from 'antd';
 
 const client = new Colyseus.Client('ws://localhost:2052');
-window.tempClient = client;
 
 // For dev
+window.tempClient = client;
 const fakeGameState = {
   players: [
     { id: '1', name: 'Enyao', isTeller: true, score: 12, roundScore: 0 },
@@ -21,6 +21,9 @@ const DIXIT = ({}) => {
   const [room, setRoom] = useState(undefined);
   const [login, setLogin] = useState(true);
   const [myId, setMyId] = useState('2');
+
+  // For dev
+  window.tempRoom = room;
 
   return <>{
     login
