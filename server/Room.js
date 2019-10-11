@@ -28,62 +28,80 @@ exports.Room = class extends colyseus.Room {
     this.cards = new Cards();
   }
 
-  onJoin (client, options) {
-    this.state.players.push({
-      id: client.id,
-      name: options.name,
-      isTeller: this.assignTeller(),
-      holdingCards: [],
-      usingCard: '',
-      voteCard: '',
-      hasBeenTellerForTimes: 0,
-      score: 0,
-      roundScore:0,
-    });
-
-    if(this.clients.length === this.maxClients)
-    {
-      this.cards.deliverCards(this);
-      this.gamePhase = GamePhase.TellerSelectingCard;
+    onJoin (client, options) {
+      this.state.players.push({
+        id: client.id,
+        name: options.name,
+        isTeller: this.assignTeller(),
+        holdingCards: [],
+        usingCard: '',
+        voteCard: '',
+        hasBeenTellerForTimes: 0,
+        score: 0,
+        roundScore: 0,
+      });
+  
+      if(this.clients.length === this.maxClients)
+      {
+        this.cards.deliverCards(this);
+        this.gamePhase = GamePhase.TellerSelectingCard;
+      }
+  
+      console.log('client joined!', this.roomName, this.roomId, client.id);
     }
 
-    console.log('client joined!', this.roomName, this.roomId, client.id);
-  }
-
   onMessage (client, message) {
-    console.log('client message!', this.roomName, this.roomId, client.id, message);
     if (this.locked === false) {
       console.warn('why do we get messages when the room is not locked?'); 
     }
-    var currentPlayer = this.getPlayerById(client.id);
+    var currentPlayer = this._getPlayerById(client.id);
 
     switch (this.state.GamePhase) {
       case GamePhase.TellerSelectingCard:
-        if (currentPlayer.isTeller === false) {
-          console.warn('Only teller can send message now.');
-        }
-        if (!message.MessageType || message.MessageType !== MessageType.TellerSelectsWord) {
-          console.warn('Message type error');
+        this._isMessageValid(true, MessageType.TellerSelectsWord);
+        if (!message.selectedCard || !message.selectedWord) {
+          console.warn('Message invalid.')
           return;
         }
-        if (!message.selectedCard || !message.theWord) {
-          console.warn('Message invalid.');
+        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) == false) {
           return;
         }
-        if (!currentPlayer.holdingCards.includes(message.selectedCard)) {
-          console.warn('you cannot choose a card you do not have.');
-          return;
-        }
+
         this.state.theWord = message.theWord;
-        currentPlayer.usingCard = message.selectedCard;
         this.state.gamePhase = GamePhase.PlayersSelectingCards;
+        console.log('teller tells!');
+
         break;
       
       case GamePhase.PlayersSelectingCards:
+        if (this._isMessageValid(false, MessageType.PlayerSelectsCard) === false)
+        {
+          return;
+        }
+        if (!message.selectedCard) {
+          console.warn('invalid card selected.');
+          return;
+        }
+        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) == false) {
+          return;
+        }
+
+        // if all players has selected their card.
+        if (this.state.players.some(function (player) {return player.usingCard == undefined;}) == false) {
+          this.state.gamePhase = GamePhase.Voting;
+        }
         break;
       
       case GamePhase.Voting:
+        this._isMessageValid(undefined, MessageType.PlayerVotes);
+        if (!message.votedCard) {
+          console.warn('invalid vote.');
+          return;
+        }
+
+      case GamePhase.GameResult:
         break;
+
       default:
         break;
     }
@@ -97,6 +115,18 @@ exports.Room = class extends colyseus.Room {
     console.log('room dispose!', this.roomName, this.roomId);
   }
 
+  _SetUsingCardAndSplice(currentPlayer, selectedCard)
+  {
+    var index = currentPlayer.indexOf(selectedCard);
+    if (index === -1)
+    {
+      console.warn('you cannot choose a card you dont have.');
+      return false;
+    }
+    currentPlayer.holdingCards.splice(index);
+    currentPlayer.usingCard = selectedCard;
+  }
+
   _getPlayerById(clientId)
   {
     return this.state.players.find(function (player) {
@@ -104,7 +134,22 @@ exports.Room = class extends colyseus.Room {
     });
   }
 
-  assignTeller() {
+  _assignTeller() {
     return this.clients.length === 1;
+  }
+
+  _isMessageValid(shouldBeTeller, expectedMessageType)
+  {
+    if (shouldBeTeller != undefined){
+      if (currentPlayer.isTeller != shouldBeTeller) {
+        console.warn('your role cannot send message now.');
+        return false;
+      }
+    }
+    if (!message.MessageType || message.MessageType !== expectedMessageType) {
+      console.warn('Message type error');
+      return false;
+    }
+    return true;
   }
 }
