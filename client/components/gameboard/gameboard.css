@@ -1,0 +1,29 @@
+.gameboard-wrapper {
+	height: 100%;
+	width: 100%;
+}
+
+.gameboard-wrapper #scoreboard {
+	height: 72px;
+	background: white;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.gameboard-wrapper .score-item {
+	flex: 0 0 120px;
+}
+
+.gameboard-wrapper .score-item.no-player {
+	opacity: 0.6;
+}
+
+.gameboard-wrapper .score-item.is-me {
+	font-weight: bold;
+}
+
+.gameboard-wrapper .score-item.is-teller {
+	color: orange;
+}

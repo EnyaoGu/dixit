@@ -48,10 +48,11 @@ RoomState:
         voteCard,
         hasBeenTellerForTimes
       }],
-      theWord,
-      roundScore: [{
-        playerId,
-        numberOfVotes
+      theWord, 
+      score: [{
+        playerName,
+        score,
+        roundScore,
       }],
     })
 }
