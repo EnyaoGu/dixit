@@ -27,6 +27,7 @@ schema.defineTypes(PlayerState, {
   hasBeenTellerForTimes: 'number',
   score: 'number',
   roundScore: 'number',
+  isReady: 'boolean',
 });
 
 class RoomState extends Schema {
