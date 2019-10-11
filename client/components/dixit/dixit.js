@@ -34,7 +34,6 @@ const DIXIT = ({}) => {
     />
     : <LOGIN
       onConfirm={(p_userName) => {
-        window.console.log(p_userName);
         setMyName(p_userName);
         setRoom(true);
       }}
