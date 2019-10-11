@@ -6,7 +6,15 @@ class PlayerState extends Schema {
   constructor (p_player) {
     super();
 
+    this.id = '';
+    this.name = '';
+    this.isTeller = false;
     this.holdingCards = new ArraySchema();
+    this.usingCard = '';
+    this.voteCard = '';
+    this.hasBeenTellerForTimes = 0;
+    this.score = 0;
+    this.roundScore = 0;
   }
 }
 schema.defineTypes(PlayerState, {
