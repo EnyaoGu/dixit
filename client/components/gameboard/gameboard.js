@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Input } from 'antd';
+import { CARDSELECTION, PageType } from '../cardselection/cardselection';
 import './gameboard.css';
 
 const noPlayerItem = (key) => <div className='score-item no-player' key={key}>No Player</div>;
 
 const GAMEBOARD = ({ gameState, myId }) => {
+  let iAmTeller = false;
   const scoreItems = gameState.players.map((player, index) => {
     const classNames = ['score-item'];
 
@@ -19,6 +21,10 @@ const GAMEBOARD = ({ gameState, myId }) => {
       classNames.push('is-teller');
     }
 
+    if (player.id === myId && player.isTeller) {
+      iAmTeller = true;
+    }
+
     return <div className={classNames.join(' ')} key={index}>
       {player.name}: {player.score}{player.roundScore ? `(+${player.roundScore})`: ''}
     </div>
@@ -30,9 +36,16 @@ const GAMEBOARD = ({ gameState, myId }) => {
 
   return <div className='gameboard-wrapper'>
     <div id='scoreboard'>{scoreItems}</div>
-    <div>
-      {JSON.stringify(gameState)}
-    </div>
+    <CARDSELECTION
+        cards={['../../resources/1.png', '../../resources/2.png', '../../resources/3.png', '../../resources/4.png', '../../resources/5.png']}
+        pageType={iAmTeller ? PageType.tellerEnterDescription : PageType.playerWaiting}
+        onCardSelected={(p_cardSelected, p_cardDescription) => {
+          window.console.log(`${p_cardSelected} is selected`);
+          if (p_cardDescription) {
+            window.console.log(`card description is ${p_cardDescription}`);
+          }
+        }}
+    />
   </div>;
 };
 
