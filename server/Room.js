@@ -54,6 +54,7 @@ exports.Room = class extends colyseus.Room {
     var currentPlayer = this._getPlayerById(client.id);
 
     switch (this.state.GamePhase) {
+
       case GamePhase.TellerSelectingCard:
         this._isMessageValid(true, MessageType.TellerSelectsWord);
         if (!message.selectedCard || !message.selectedWord) {
@@ -61,7 +62,7 @@ exports.Room = class extends colyseus.Room {
           return;
         }
 
-        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) == false) {
+        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) === false) {
           return;
         }
         this.state.theWord = message.theWord;
@@ -71,8 +72,7 @@ exports.Room = class extends colyseus.Room {
         break;
       
       case GamePhase.PlayersSelectingCards:
-        if (this._isMessageValid(false, MessageType.PlayerSelectsCard) === false)
-        {
+        if (this._isMessageValid(false, MessageType.PlayerSelectsCard) === false){
           return;
         }
         if (!message.selectedCard) {
@@ -91,7 +91,9 @@ exports.Room = class extends colyseus.Room {
       
       case GamePhase.Voting:
         // host cannot vote.
-        this._isMessageValid(false, MessageType.PlayerVotes);
+        if (this._isMessageValid(false, MessageType.PlayerVotes) == false){
+          return;
+        }
         if (!message.votedCard) {
           console.warn('invalid vote.');
           return;
@@ -106,17 +108,34 @@ exports.Room = class extends colyseus.Room {
         owner.voters.push(currentPlayer.id);
 
         // if all players votes
-        if (this.state.players.some(function (player) {return player.votedCard == undefined;}) == false) {
-          this.state.gamePhase = this.gamePhase.GameResult;
+        if (this.state.players.some(function (player) {return player.votedCard === undefined;}) === false) {
+          this.state.gamePhase = GamePhase.GameResult;
+          this.state.players.forEach(player => {
+            player.isReady = false;
+          });
         }
+        break;
 
         this._scoreCalculator();
         this.GamePhase = GamePhase.GameResult;
 
       case GamePhase.GameResult:
+        // Now we'll decide whether to start a new round
+        if (this._isMessageValid(undefined, MessageType.ReadyForNextTurn) == false){
+          return;
+        }
+        currentPlayer.isReady = true;
+
+        if (this.state.players.some(function (player) {return player.isReady === false;}) === false){
+          this._initNextRound();
+          this._assignRandomTeller();
+          this.cards.replenishCard(this);
+          this.state.gamePhase = GamePhase.TellerSelectingCard;
+        }
         break;
 
       default:
+        console.warn('messages are not expected here.');
         break;
     }
   }
@@ -150,6 +169,13 @@ exports.Room = class extends colyseus.Room {
 
   _assignTeller() {
     return this.clients.length === 1;
+  }
+
+  _assignRandomTeller(){
+    var index = Math.floor(Math.random()*(this.clients.length));
+    var selectedPlayer = this.state.palyers[index];
+    selectedPlayer.isTeller = true;
+    selectedPlayer.hasBeenTellerForTimes = selectedPlayer.hasBeenTellerForTimes + 1;
   }
 
   _isMessageValid(shouldBeTeller, expectedMessageType)
@@ -205,6 +231,13 @@ exports.Room = class extends colyseus.Room {
 
     this.state.players.forEach(player =>{
       player.score += player.roundScore;
+  _initNextRound(){
+    this.players.forEach(player => {
+      player.isTeller = false;
+      player.holdingCards = [];
+      player.usingCard = undefined;
+      player.votedCard = undefined;
+      player.roundScore = undefined;
     });
   }
 }

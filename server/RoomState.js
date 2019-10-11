@@ -6,8 +6,16 @@ class PlayerState extends Schema {
   constructor (p_player) {
     super();
 
+    this.id = '';
+    this.name = '';
+    this.isTeller = false;
     this.holdingCards = new ArraySchema();
-    this.voter = new ArraySchema();
+    this.voters = new ArraySchema();
+    this.usingCard = '';
+    this.voteCard = '';
+    this.hasBeenTellerForTimes = 0;
+    this.score = 0;
+    this.roundScore = 0;
   }
 }
 schema.defineTypes(PlayerState, {
@@ -21,6 +29,7 @@ schema.defineTypes(PlayerState, {
   voters: ['string'],
   score: 'number',
   roundScore: 'number',
+  isReady: 'boolean',
 });
 
 class RoomState extends Schema {
