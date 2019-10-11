@@ -1,39 +1,37 @@
 exports.Cards = class Cards {
-}
-
-Cards.Capacity = 80;
-Cards.lib = genCardLib(this.capacity);
-
-function deliverCards(room){
-    var cardLib = this.lib;
-    room.players.forEach(player => {
-        player.holdingCards = cardsOneShare(cardLib);
-    });
-}
-
-function selectCard(room, playerId){
-    
-}
-
-function genCardLib(capacity){
-    var cardLib = new Array();
-    for(var i=1;i<=capacity;i++)
-    {
-        cardLib.push(i.toString());
+    constructor() {
+        this.capacity = 80;
+        this.lib = genCardLib(this.capacity);
     }
-    return cardLib;
-}
 
-function cardsOneShare(cardLib){
-    var cardsOneShare = new Array();
-    for(var i =0; i<5; i++)
-    {
-        var tag = Math.floor(Math.random()*79 +1).toString();
-        if (cardsOneShare.find(function(card) {return card == tag}) == undefined)
+    deliverCards(room){
+        var cardLib = this.lib;
+        room.players.forEach(player => {
+            player.holdingCards = cardsOneShare(cardLib);
+        });
+    }
+
+    selectCard(room, playerId){
+        
+    }
+
+    genCardLib(capacity){
+        var cardLib = new Array();
+        for(var i=1;i<= capacity;i++)
         {
-            cardsOneShare.push(tag);
-            cardLib.pop(tag);
+            cardLib.push(i.toString());
         }
+        return cardLib;
     }
-    return cardsOneShare;
+
+    cardsOneShare(cardLib){
+        var cardsOneShare = [];
+        for(var i =0; i<5; i++)
+        {
+            var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
+            cardsOneShare.push(cardLib[index]);
+            // cardLib.pop(tag);
+        }
+        return cardsOneShare;
+    }
 }
