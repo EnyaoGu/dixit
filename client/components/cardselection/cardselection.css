@@ -13,3 +13,7 @@
 	color: #fff;
 }
 
+.enter-description-wrapper {
+	display: flex;
+	flex-direction: row;
+}
