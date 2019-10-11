@@ -1,5 +1,7 @@
 const colyseus = require('colyseus');
 const { Cards } = require('./Cards');
+const { RoomState, PlayerState } = require('./RoomState');
+
 const GamePhase = {
     Boarding : 'Boarding',
     TellerSelectingCard : 'TellerSelectingCard',
@@ -18,28 +20,21 @@ const MessageType = {
 exports.Room = class extends colyseus.Room {
   onCreate (options) {
     console.log('room created!', this.roomName, this.roomId, options);
-    this.state = this.setState({
-      round: 1,
-      gamePhase: GamePhase.Boarding,
-      players: [],
-      theWord: '',
-    })
+    this.setState(new RoomState());
+    this.state.round = 0;
+    this.state.gamePhase = GamePhase.Boarding;
+    this.state.theWord = '';
+
     this.maxClients = 4;
     this.cards = new Cards();
   }
 
   onJoin (client, options) {
-    this.state.players.push({
-      id: client.id,
-      name: options.name,
-      isTeller: this.assignTeller(),
-      holdingCards: [],
-      usingCard: '',
-      voteCard: '',
-      hasBeenTellerForTimes: 0,
-      score: 0,
-      roundScore:0,
-    });
+    const newPlayer = new PlayerState();
+    newPlayer.id = client.id;
+    newPlayer.name = options.name;
+    newPlayer.isTeller = this.assignTeller();
+    this.state.players.push(newPlayer);
 
     if(this.clients.length === this.maxClients)
     {
