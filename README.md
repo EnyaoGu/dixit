@@ -36,21 +36,24 @@ Workflow:
 RoomState:
 ```js
 {
-	round: number,
-	phase: string,
-	players: [{
-		id: string,
-		name: string,
-		isTeller: boolean,
-		handCards: string[],
-		usingCard: string,
-		voteCard: string,
-		hasBeenTellerForTimes: number,
-	}]
-	theWord:string,
-	score:{
-		'PlayerId':number,
-		...otherPlayers,
-	}
+    this.state = this.setState({
+      round: -1,
+      gamePhase: GamePhase.Boarding,
+      players: [{
+        id,
+        name,
+        state,
+        isTeller, 
+        holdingCards,
+        usingCard,
+        voteCard,
+        hasBeenTellerForTimes
+      }],
+      theWord,
+      roundScore: [{
+        playerId,
+        numberOfVotes
+      }],
+    })
 }
 ```

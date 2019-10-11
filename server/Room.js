@@ -1,8 +1,35 @@
 const colyseus = require('colyseus');
+const GamePhase = {
+    Boarding : 0,
+    TellerSelectingCard : 1,
+    PlayersSelectingCards : 2,
+    Voting : 3,
+    GameResult : 4
+}
 
 exports.Room = class extends colyseus.Room {
   onCreate (options) {
     console.log('room created!', this.roomName, this.roomId, options);
+    this.state = this.setState({
+      round: -1,
+      gamePhase: GamePhase.Boarding,
+      players: [{
+        id,
+        name,
+        state,
+        isTeller, 
+        holdingCards,
+        usingCard,
+        voteCard,
+        hasBeenTellerForTimes
+      }],
+      theWord,
+      roundScore: [{
+        playerId,
+        numberOfVotes
+      }],
+    })
+    this.maxClients = 4;
   }
 
   onJoin (client, options) {
@@ -21,3 +48,4 @@ exports.Room = class extends colyseus.Room {
     console.log('room dispose!', this.roomName, this.roomId);
   }
 }
+
