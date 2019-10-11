@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './dixit.css'
 import * as Colyseus from "colyseus.js";
 import LOGIN from '../login/login';
+import RESULT from '../result/result';
 import GAMEBOARD from '../gameboard/gameboard'
 
 const client = new Colyseus.Client('ws://localhost:2052');
@@ -18,7 +19,7 @@ const fakeGameState = {
 
 const DIXIT = ({}) => {
   const [room, setRoom] = useState(undefined);
-  const [myId, setMyId] = useState('2');
+  const [myId, setMyId] = useState('1');
 
   return <>{
     room
@@ -26,11 +27,16 @@ const DIXIT = ({}) => {
       gameState={fakeGameState}
       myId={myId}
     />
-    : <LOGIN
-      onConfirm={(p_userName) => {
-        setRoom(true);
-      }}
-    />
+    : <RESULT cards={[
+      { src: '../../resources/1.png', voters: ['Player 1, Player 3'] },
+      { src: '../../resources/2.png', voters: ['Player 2'] },
+      { src: '../../resources/3.png', voters: [] },
+      { src: '../../resources/4.png', voters: []}]} />
+    // : <LOGIN
+    //   onConfirm={(p_userName) => {
+    //     setRoom(true);
+    //   }}
+    // />
   }</>;
 };
 
