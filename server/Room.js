@@ -54,7 +54,6 @@ exports.Room = class extends colyseus.Room {
     var currentPlayer = this._getPlayerById(client.id);
 
     switch (this.state.GamePhase) {
-
       case GamePhase.TellerSelectingCard:
         this._isMessageValid(true, MessageType.TellerSelectsWord);
         if (!message.selectedCard || !message.selectedWord) {
@@ -231,8 +230,11 @@ exports.Room = class extends colyseus.Room {
 
     this.state.players.forEach(player =>{
       player.score += player.roundScore;
-  _initNextRound(){
-    this.players.forEach(player => {
+    });
+  }
+
+  _initNextRound() {
+    this.state.players.forEach(player => {
       player.isTeller = false;
       player.holdingCards = [];
       player.usingCard = undefined;
