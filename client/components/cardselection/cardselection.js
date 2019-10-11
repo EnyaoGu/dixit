@@ -6,6 +6,7 @@ import './cardselection.css';
 
 const PageType = Object.freeze({
     tellerEnterDescription: 'teller enter description',
+    playerWaiting: 'player waiting teller to enter description',
     playerPickCard: 'player Pick his card',
     vote: 'vote',
 });
@@ -14,13 +15,35 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
     const [cardDescription, setCardDescription] = useState('');
     const [cardSelected, setCardSelected] = useState('');
 
+    let carouselHeader;
+    let carouseButtonText;
+    switch (pageType) {
+    case PageType.tellerEnterDescription:
+        carouselHeader = <Card bordered={false} ><p>Select one card and enter your description.</p></Card>;
+        break;
+    case PageType.playerWaiting:
+        carouselHeader = <Card bordered={false} ><p>Wait for the teller to select card and enter description.</p></Card>;
+        break;
+    case PageType.playerPickCard:
+        carouselHeader = <Card bordered={false} ><p>Select your card by the description.</p></Card>;
+        carouseButtonText = 'Use this card';
+        break;
+    case PageType.vote:
+        carouselHeader = <Card bordered={false} ><p>Find the teller's card by the description.</p></Card>;
+        carouseButtonText = 'Vote';
+        break;
+    }
+
     const items = [];
     for (const [index, value] of cards.entries()) {
-        items.push(<Card key={index} cover={<img src={value} />}/>);
+        items.push(<Card key={index} bordered={false} cover={<img src={value} />}/>);
     }
 
     return <>
         <div className={'select-cards-wrapper'}>
+            <div>
+                {carouselHeader}
+            </div>
             <Carousel afterChange={(index) => {
                 setCardSelected(cards[index]);
             }}
@@ -50,23 +73,13 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
                     </div>
                     : null
                 }
-                { pageType === PageType.playerPickCard ?
+                { pageType === PageType.playerPickCard || pageType === PageType.vote ?
                     <Button
                         type='primary'
                         onClick={() => onCardSelected(cardSelected)}
                         size='large'
                     >
-                        Use this card
-                    </Button>
-                    : null
-                }
-                { pageType === PageType.vote ?
-                    <Button
-                        type='primary'
-                        onClick={() => onCardSelected(cardSelected)}
-                        size='large'
-                    >
-                        Vote
+                        {carouseButtonText}
                     </Button>
                     : null
                 }

@@ -1,6 +1,14 @@
 .select-cards-wrapper {
 }
 
+.ant-card-body {
+	padding: 5px;
+}
+
+p {
+	margin-block-end: 0;
+}
+
 .ant-carousel .slick-slide {
 	text-align: center;
 	height: 400px;
@@ -14,6 +22,8 @@
 }
 
 .enter-description-wrapper {
+	margin-left: 3px;
+	margin-right: 3px;
 	display: flex;
 	flex-direction: row;
 }
