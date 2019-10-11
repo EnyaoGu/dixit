@@ -40,17 +40,18 @@ RoomState:
       round: -1,
       gamePhase: GamePhase.Boarding,
       players: [{
-        id,
-        name,
-        isTeller, 
-        holdingCards,
-        usingCard,
-        voteCard,
-        hasBeenTellerForTimes,
-        score,
-        roundScore,
+        id: 'string',
+        name: 'string',
+        isTeller: 'boolean', 
+        holdingCards: [ 'string' ],
+        usingCard: 'string',
+        voteCard: 'string',
+        hasBeenTellerForTimes: 'number',
+        score: 'number',
+        roundScore: 'number',
+        isReady: 'boolean',
       }],
-      theWord, 
+      theWord,
     })
 }
 ```
