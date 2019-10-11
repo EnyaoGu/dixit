@@ -42,7 +42,6 @@ RoomState:
       players: [{
         id,
         name,
-        state,
         isTeller, 
         holdingCards,
         usingCard,
@@ -56,4 +55,12 @@ RoomState:
       }],
     })
 }
+```
+Message from client to server
+```js
+msg = {
+    string messageType = Room.MessageType.xxx,
+    string selectedCard = Cards.CardIds.xxx,
+    string selectedWord = "the word"};
+    string votedCard = Cards.CardIds.xxx}
 ```
