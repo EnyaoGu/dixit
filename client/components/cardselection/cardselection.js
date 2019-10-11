@@ -14,24 +14,20 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
     const [cardDescription, setCardDescription] = useState('');
     const [cardSelected, setCardSelected] = useState('');
 
+    const items = [];
+    for (const [index, value] of cards.entries()) {
+        items.push(<div>
+            <Card cover={<img src={value} />}/>
+        </div>);
+    }
+
     return <>
         <div className={'select-cards-wrapper'}>
             <Carousel afterChange={(index) => {
                 setCardSelected(cards[index]);
             }}
             >
-                <div>
-                    <Card cover={<img src={cards[0]} />}/>
-                </div>
-                <div>
-                    <Card cover={<img src={cards[1]} />}/>
-                </div>
-                <div>
-                    <Card cover={<img src={cards[2]} />}/>
-                </div>
-                <div>
-                    <Card cover={<img src={cards[3]} />}/>
-                </div>
+                {items}
             </Carousel>
             <div align={'center'} style={{marginTop:10+'px'}}>
                 { pageType === PageType.tellerEnterDescription ?
