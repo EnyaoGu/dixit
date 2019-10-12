@@ -3,6 +3,7 @@ import { Button, Card, Carousel, Input } from 'antd';
 import 'antd/dist/antd.css';
 import PropTypes from 'prop-types';
 import './cardselection.css';
+import { getCardImageUrl } from '../../utilities/common';
 
 const PageType = Object.freeze({
     tellerEnterDescription: 'teller enter description',
@@ -11,10 +12,6 @@ const PageType = Object.freeze({
     playerPickCard: 'player Pick his card',
     vote: 'vote',
 });
-
-const getCardImageUrl = (p_cardName) => {
-    return `../../resources/${p_cardName}.png`;
-}
 
 const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     const [cardDescription, setCardDescription] = useState('');
