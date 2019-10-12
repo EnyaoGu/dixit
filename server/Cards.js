@@ -5,23 +5,23 @@ exports.Cards = class Cards {
     }
 
     deliverCards(room){
-        room.state.players.forEach(player => {
-            if (this.lib.length >= room.maxClients*5) {
+        if (this.lib.length >= room.maxClients*5) {
+            room.state.players.forEach(player => {
                 this.cardsOneShare(this.lib, 5).forEach((p_card) => player.holdingCards.push(p_card));
-            } else {
-                console.warn("We don't have enough cards for all players.");
-            }
-        });
+            });
+        } else {
+            console.warn("We don't have enough cards for all players.");
+        }
     }
 
     replenishCard(room){
-        room.state.players.forEach(player => {
-            if (this.lib.length > room.maxClients) {
+        if (this.lib.length > room.maxClients) {
+            room.state.players.forEach(player => {
                 player.holdingCards.push(this.cardsOneShare(this.lib, 1)[0]);
-            } else {
-                console.warn("We are out of cards! Start a new game.");
-            }
-        });
+            });
+        } else {
+            console.warn("We are out of cards! Start a new game.");
+        }
     }
 
     genCardLib(capacity){
