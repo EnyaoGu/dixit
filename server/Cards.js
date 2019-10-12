@@ -6,12 +6,9 @@ exports.Cards = class Cards {
 
     deliverCards(room){
         room.state.players.forEach(player => {
-            if(this.lib.length >= room.maxClients*5)
-            {
-                player.holdingCards = this.cardsOneShare(this.lib, 5);
-            }
-            else
-            {
+            if (this.lib.length >= room.maxClients*5) {
+                this.cardsOneShare(this.lib, 5).forEach((p_card) => player.holdingCards.push(p_card));
+            } else {
                 console.warn("We don't have enough cards for all players.");
             }
         });
@@ -19,12 +16,9 @@ exports.Cards = class Cards {
 
     replenishCard(room){
         room.state.players.forEach(player => {
-            if(this.lib.length > room.maxClients)
-            {
-                player.holdingCards = this.cardsOneShare(this.lib, 1);
-            }
-            else
-            {
+            if (this.lib.length > room.maxClients) {
+                player.holdingCards.push(this.cardsOneShare(this.lib, 1)[0]);
+            } else {
                 console.warn("We are out of cards! Start a new game.");
             }
         });
@@ -41,15 +35,13 @@ exports.Cards = class Cards {
 
     cardsOneShare(cardLib, number){
         var cardsOneShare = [];
-        if(number >0)
+
+        for(var i =0; i< number; i++)
         {
-            for(var i =0; i< number; i++)
-            {
-                var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
-                cardsOneShare.push(cardLib[index]);
-                cardLib.splice(index,1);
-            }
-            return cardsOneShare;
+            var index = Math.floor(Math.random()*(cardLib.length - 1) +1);
+            cardsOneShare.push(cardLib[index]);
+            cardLib.splice(index,1);
         }
+        return cardsOneShare;
     }
 }
