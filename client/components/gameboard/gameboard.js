@@ -121,17 +121,29 @@ const getCards = (pageType, players, myState) => {
   return [];
 }
 
+const parseGameState = (roomState) => {
+  const gameState = roomState.toJSON();
+  gameState.players = gameState.playerJSONs.map((playerJSON) => {
+    return JSON.parse(playerJSON);
+  });
+
+  return gameState;
+};
+
 const GAMEBOARD = ({ room }) => {
-  const [ gameState, setGameState ] = useState(room.state.toJSON());
+  const [ gameState, setGameState ] = useState(parseGameState(room.state));
+
   const [ gameStateThrottle, setGameStateThrottle ] = useState(null);
-  room.state.onChange = () => {
-    if (gameStateThrottle) { return; }
-    const timeout = setTimeout(() => {
-      setGameStateThrottle(null);
-      setGameState(room.state.toJSON());
-    }, 100);
-    setGameStateThrottle(timeout);
-  };
+  useEffect(() => {
+    room.onStateChange(() => {
+      if (gameStateThrottle) { return; }
+      const timeout = setTimeout(() => {
+        setGameStateThrottle(null);
+        setGameState(parseGameState(room.state));
+      }, 100);
+      setGameStateThrottle(timeout);
+    });
+  }, [room]);
   window.console.log(gameState);
 
   const [ waiting, setWaiting ] = useState(false);
