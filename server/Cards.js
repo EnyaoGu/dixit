@@ -1,6 +1,6 @@
 exports.Cards = class Cards {
     constructor() {
-        this.capacity = 80;
+        this.capacity = 53;
         this.lib = this.genCardLib(this.capacity);
     }
 
