@@ -18,6 +18,7 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     const [cardSelected, setCardSelected] = useState(cards[0]);
     const [previousPageType, setPreviousPageType] = useState('');
     const [waitingStatus, setWaitingStatus] = useState(false);
+    const previousType = previousPageType;
     if (previousPageType !== pageType) {
         setWaitingStatus(false);
         setPreviousPageType(pageType);
@@ -51,6 +52,9 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
         items.push(<Card key={index} bordered={false} cover={<img src={getCardImageUrl(value)} />}/>);
     }
     useEffect(() => {
+        if (previousType === pageType || previousType === PageType.tellerEnterDescription && pageType === PageType.playerPickCard) {
+           return;
+        }
         if (carouselRef.current) { carouselRef.current.goTo(0, true); }
         setCardSelected(cards[0]);
     }, [cards]);
