@@ -108,10 +108,10 @@ exports.Room = class extends colyseus.Room {
 
         // All not-teller players votes
         if (!this.state.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
-          this.state.gamePhase = GamePhase.GameResult;
           this.state.players.forEach(player => {
             player.isReady = false;
           });
+          this._scoreCalculator();
           this.state.gamePhase = GamePhase.GameResult;
         }
         break;
