@@ -126,12 +126,8 @@ exports.Room = class extends colyseus.Room {
 
         if (this.state.players.some(function (player) {return player.isReady === false;}) === false){
           this._initNextRound();
-          this._assignRandomTeller();
-          this.cards.replenishCard(this);
-          this.state.gamePhase = GamePhase.TellerSelectingCard;
         }
         break;
-
       default:
         console.warn('messages are not expected here.');
         break;
@@ -190,11 +186,15 @@ exports.Room = class extends colyseus.Room {
     return this.state.players.length === 1;
   }
 
-  _assignRandomTeller(){
-    var index = Math.floor(Math.random()*(this.clients.length));
-    var selectedPlayer = this.state.palyers[index];
-    selectedPlayer.isTeller = true;
-    selectedPlayer.hasBeenTellerForTimes = selectedPlayer.hasBeenTellerForTimes + 1;
+  _assignNextTeller(){
+    const nextTeller = this.state.players.reduce((tellerCadicate, player) => {
+      if (player.hasBeenTellerForTimes < tellerCadicate.hasBeenTellerForTimes) {
+        return player;
+      }
+      return tellerCadicate;
+    });
+
+    nextTeller.isTeller = true;
   }
 
   _isMessageValid(message, expectedMessageType, player, shouldBeTeller) {
@@ -210,11 +210,8 @@ exports.Room = class extends colyseus.Room {
     return true;
   }
 
-  _findCardOwnerPlayer(card)
-  {
-    return this.state.players.find(function (player) {
-      return player.usingCard.includes(card);
-    });
+  _findCardOwnerPlayer(card) {
+    return this.state.players.find((player) => player.usingCard === card);
   }
 
   _scoreCalculator() {
@@ -243,19 +240,23 @@ exports.Room = class extends colyseus.Room {
     guests.forEach(function (guest){
       guest.roundScore += guest.voters.length;
       });
-
-    this.state.players.forEach(function (player) {
-      player.score += player.roundScore;
-    });
   }
 
   _initNextRound() {
+    this.state.round += 1;
+    this.state.theWord = '';
     this.state.players.forEach(player => {
+      player.hasBeenTellerForTimes += player.isTeller ? 1 : 0;
       player.isTeller = false;
-      player.holdingCards = [];
-      player.usingCard = undefined;
-      player.votedCard = undefined;
-      player.roundScore = undefined;
+      player.isReady = false;
+      player.usingCard = '';
+      player.votedCard = '';
+      player.score += player.roundScore;
+      player.roundScore = 0;
+      player.voters.splice(0, player.voters.length);
     });
+    this._assignNextTeller();
+    this.cards.replenishCard(this);
+    this.state.gamePhase = GamePhase.TellerSelectingCard;
   }
 }
