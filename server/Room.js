@@ -36,6 +36,7 @@ exports.Room = class extends colyseus.Room {
     this.players.forEach((player, index) => {
       this.state.playerJSONs[index] = JSON.stringify(player);
     });
+    this.state.playerJSONs.splice(this.players.length);
   }
 
   onJoin (client, options) {
