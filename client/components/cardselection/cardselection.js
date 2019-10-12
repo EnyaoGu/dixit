@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Carousel, Input } from 'antd';
+import { Button, Card, Carousel, Input, Spin } from 'antd';
 import 'antd/dist/antd.css';
 import PropTypes from 'prop-types';
 import './cardselection.css';
@@ -53,7 +53,7 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     return <>
         <div className={'select-cards-wrapper'}>
             { pageType === PageType.playerPickCard && waitingStatus ?
-                <div></div>
+                <div className='waiting-spin-overlay'><Spin /></div>
                 :
                 <div>
                     <div>
