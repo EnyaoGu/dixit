@@ -129,7 +129,15 @@ const fakeGameState = {
 const GAMEBOARD = ({ room }) => {
   // const [ gameState, setGameState ] = useState(fakeGameState);
   const [ gameState, setGameState ] = useState(room.state.toJSON());
-  room.onStateChange(() => setGameState(room.state.toJSON()));
+  const [ gameStateThrottle, setGameStateThrottle ] = useState(null);
+  room.state.onChange = () => {
+    if (gameStateThrottle) { return; }
+    const timeout = setTimeout(() => {
+      setGameStateThrottle(null);
+      setGameState(room.state.toJSON());
+    }, 100);
+    setGameStateThrottle(timeout);
+  };
   window.console.log(gameState);
 
   const myId = room.sessionId;
