@@ -5,7 +5,7 @@ import LOGIN from '../login/login';
 import GAMEBOARD from '../gameboard/gameboard';
 import { Spin } from 'antd';
 
-const client = new Colyseus.Client('ws://localhost:2052');
+const client = new Colyseus.Client(`ws://${document.location.hostname}:2052`);
 
 const DIXIT = ({}) => {
   const [room, setRoom] = useState(undefined);
