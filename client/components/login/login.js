@@ -7,11 +7,6 @@ const LOGIN = ({ onConfirm }) => {
   const [userName, setUserName] = useState('');
 
   return <div className={'login-wrapper'}>
-    <div
-      id='title'
-    >
-      DIXIT
-    </div>
     <Input
       id='user-name'
       placeholder='Enter your name'

@@ -6,13 +6,12 @@
 	align-items: center;
 }
 
-.login-wrapper #title {
-	font-size: 32px;
-	margin-top: 200px;
-	margin-bottom: 60px;
+.login-wrapper #user-name {
+	margin-top: 250px;
+	width: 240px;
+	margin-bottom: 10px;
 }
 
-.login-wrapper #user-name {
-	width: 240px;
-	margin-bottom: 20px;
+.login-wrapper button {
+	margin-left: 20px;
 }
