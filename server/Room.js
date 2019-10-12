@@ -33,13 +33,13 @@ exports.Room = class extends colyseus.Room {
   onJoin (client, options) {
     console.log('player joined!', this.roomName, this.roomId, client.id, options);
     const newPlayer = new PlayerState();
+    this.state.players.push(newPlayer);
     newPlayer.id = client.id;
     newPlayer.name = options.name;
-    newPlayer.isTeller = this._assignTeller();
-    if (newPlayer.isTeller = this._assignTeller()) {
-      newPlayer.hasBeenTellerForTimes +1;
+    newPlayer.isTeller = this._shouldAssignInitialTeller();
+    if (newPlayer.isTeller) {
+      newPlayer.hasBeenTellerForTimes = 1;
     }
-    this.state.players.push(newPlayer);
 
     if (this.state.players.length === this.maxClients)
     {
@@ -103,7 +103,7 @@ exports.Room = class extends colyseus.Room {
         }
         currentPlayer.votedCard = message.votedCard;
         // find owner and add voter
-        var owner = this._findCardOwner(currentPlayer.votedCard);
+        var owner = this._findCardOwnerPlayer(currentPlayer.votedCard);
         owner.voters.push(currentPlayer.id);
 
         // if all not-teller players votes
@@ -112,10 +112,8 @@ exports.Room = class extends colyseus.Room {
           this.state.players.forEach(player => {
             player.isReady = false;
           });
+          this.state.gamePhase = GamePhase.GameResult;
         }
-        
-        this._scoreCalculator();
-        this.GamePhase = GamePhase.GameResult;
         break;
 
       case GamePhase.GameResult:
@@ -168,8 +166,8 @@ exports.Room = class extends colyseus.Room {
     });
   }
 
-  _assignTeller() {
-    return this.clients.length === 0;
+  _shouldAssignInitialTeller() {
+    return this.state.players.length === 1;
   }
 
   _assignRandomTeller(){
@@ -192,10 +190,10 @@ exports.Room = class extends colyseus.Room {
     return true;
   }
 
-  _findCardOwner(card)
+  _findCardOwnerPlayer(card)
   {
-    return this.state.palyers.find(function (player) {
-      return player.holdingCards.includes(card);
+    return this.state.players.find(function (player) {
+      return player.usingCard.includes(card);
     });
   }
 
@@ -206,29 +204,27 @@ exports.Room = class extends colyseus.Room {
     var guests = this.state.players.splice(this.state.players.indexOf(host),1);
     var hostVote = host.voters.length;
 
-    if (hostVote === 0 || hostVote === 3){
+    if (hostVote === 0 || hostVote === (this.maxClients  - 1)){
       host.roundScore = 0;
-      guests.forEach(guest =>{
+      guests.forEach(function (guest){
         guest.roundScore = 2;
       });
       roundScore = 2;
     }
     else{
-      host.roundScore = hostVote * 3;
+      host.roundScore = 3;
 
-      host.voters.forEach(voter => {
+      host.voters.forEach(function (voter){
         var player = this._getPlayerById(voter);
         player.roundScore = 3;
       });
     }
 
-    guests.forEach(guest =>{
-      if (owner = this._findCardOwner(guest.votedCard) != host){
-        owner.roundScore + 1;
-      }
-    });
+    guests.forEach(function (guest){
+      guest.roundScore += guest.voters.length;
+      });
 
-    this.state.players.forEach(player =>{
+    this.state.players.forEach(function (player) {
       player.score += player.roundScore;
     });
   }
