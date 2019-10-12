@@ -221,10 +221,8 @@ exports.Room = class extends colyseus.Room {
     }
 
     guests.forEach(function (guest){
-      if (this._findCardOwnerPlayer(guest.votedCard) !== host){
-        owner.roundScore += 1;
-      }
-    });
+      guest.roundScore += guest.voters.length;
+      });
 
     this.state.players.forEach(function (player) {
       player.score += player.roundScore;
