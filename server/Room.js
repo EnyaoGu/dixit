@@ -26,7 +26,7 @@ exports.Room = class extends colyseus.Room {
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
 
-    this.maxClients = 2;
+    this.maxClients = 4;
     this.cards = new Cards();
   }
 
@@ -140,6 +140,26 @@ exports.Room = class extends colyseus.Room {
 
   onLeave (client, consented) {
     console.log('client left!', this.roomName, this.roomId, client.id);
+
+    const leftPlayerIndex = this.state.players.findIndex((player) => player.id === client.id);
+    this.state.players.splice(leftPlayerIndex, 1);
+
+    // Roll back to init state
+    this.state.round = 0;
+    this.state.gamePhase = GamePhase.Boarding;
+    this.state.theWord = '';
+    this.state.players.forEach((player) => {
+      player.holdingCards.splice(0, player.holdingCards.length);
+      player.voters.splice(0, player.voters.length);
+      player.usingCard = '';
+      player.votedCard = '';
+      player.score = 0;
+      player.roundScore = 0;
+      player.isReady = true;
+      player.isTeller = false;
+      player.hasBeenTellerForTimes = 0;
+    });
+    this.cards = new Cards();
   }
 
   onDispose() {
