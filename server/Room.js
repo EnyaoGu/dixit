@@ -36,13 +36,10 @@ exports.Room = class extends colyseus.Room {
     this.state.players.push(newPlayer);
     newPlayer.id = client.id;
     newPlayer.name = options.name;
-    newPlayer.isTeller = this._shouldAssignInitialTeller();
-    if (newPlayer.isTeller) {
-      newPlayer.hasBeenTellerForTimes = 1;
-    }
-
+    
     if (this.state.players.length === this.maxClients)
     {
+      this._assignNextTeller();
       this.cards.deliverCards(this);
       this.state.gamePhase = GamePhase.TellerSelectingCard;
     }
@@ -108,10 +105,10 @@ exports.Room = class extends colyseus.Room {
 
         // All not-teller players votes
         if (!this.state.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
-          this.state.gamePhase = GamePhase.GameResult;
           this.state.players.forEach(player => {
             player.isReady = false;
           });
+          this._scoreCalculator();
           this.state.gamePhase = GamePhase.GameResult;
         }
         break;
@@ -215,10 +212,12 @@ exports.Room = class extends colyseus.Room {
   }
 
   _scoreCalculator() {
-    var host = this.state.players.find(function (player){
+    var hostIndex = this.state.players.findIndex(function (player){
       return player.isTeller === true;
     });
-    var guests = this.state.players.splice(this.state.players.indexOf(host),1);
+    var host = this.state.players[hostIndex];
+    var guests = this.state.players.slice();
+    guests.splice(hostIndex, 1);
     var hostVote = host.voters.length;
 
     if (hostVote === 0 || hostVote === (this.maxClients  - 1)){
@@ -226,12 +225,11 @@ exports.Room = class extends colyseus.Room {
       guests.forEach(function (guest){
         guest.roundScore = 2;
       });
-      roundScore = 2;
     }
     else{
       host.roundScore = 3;
 
-      host.voters.forEach(function (voter){
+      host.voters.forEach((voter) => {
         var player = this._getPlayerById(voter);
         player.roundScore = 3;
       });
