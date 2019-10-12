@@ -143,6 +143,8 @@ const GAMEBOARD = ({ room }) => {
       }, 100);
       setGameStateThrottle(timeout);
     });
+
+    setGameState(parseGameState(room.state));
   }, [room]);
   window.console.log(gameState);
 
@@ -177,6 +179,7 @@ const GAMEBOARD = ({ room }) => {
           cards={cards}
           theWord={gameState.theWord}
           pageType={pageType}
+          myState={myState}
           onConfirm={(p_selectedCard, p_descriptionWord) => {
             const message = generateMessage(pageType, p_selectedCard, p_descriptionWord);
             if (message) {

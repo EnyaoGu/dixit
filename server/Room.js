@@ -144,7 +144,23 @@ exports.Room = class extends colyseus.Room {
     }
   }
 
-  onLeave (client, consented) {
+  onLeave(client, consented) {
+    if (!consented) {
+      console.log('abnormal client disconnect', this.roomName, this.roomId, client.id);
+      this.allowReconnection(client, 20)
+        .then(() => {
+          console.log('client reconnected', this.roomName, this.roomId, client.id);
+
+          if (this.clients.length === this.maxClients) { this.lock (); }
+        })
+        .catch(() => this._handlePlayerActualLeave(client));
+      return;
+    }
+
+    this._handlePlayerActualLeave(client);
+  }
+
+  _handlePlayerActualLeave(client) {
     console.log('client left!', this.roomName, this.roomId, client.id);
 
     const leftPlayerIndex = this.players.findIndex((player) => player.id === client.id);
@@ -166,6 +182,8 @@ exports.Room = class extends colyseus.Room {
     });
     this._updatePlayerJSONs();
     this.cards = new Cards();
+
+    this.unlock ();
   }
 
   onDispose() {

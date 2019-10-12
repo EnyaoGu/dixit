@@ -13,7 +13,7 @@ const PageType = Object.freeze({
     vote: 'vote',
 });
 
-const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
+const CARDSELECTION = ({ cards, pageType, theWord, myState, onConfirm }) => {
     const [cardDescription, setCardDescription] = useState('');
     const [cardSelected, setCardSelected] = useState(cards[0]);
     const [previousPageType, setPreviousPageType] = useState('');
@@ -39,10 +39,12 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     case PageType.playerPickCard:
         carouselHeader = <Card bordered={false} ><p>Select your card for <b>{theWord}</b>.</p></Card>;
         carouseButtonText = 'Use this card';
+        if (myState.usingCard && !waitingStatus) { setWaitingStatus(true); }
         break;
     case PageType.vote:
         carouselHeader = <Card bordered={false} ><p>Find the teller's card for <b>{theWord}</b>.</p></Card>;
         carouseButtonText = 'Vote';
+        if (myState.votedCard && !waitingStatus) { setWaitingStatus(true); }
         break;
     }
 
@@ -124,6 +126,7 @@ CARDSELECTION.propTypes = {
     cards: PropTypes.array.isRequired,
     pageType: PropTypes.string.isRequired,
     theWord: PropTypes.string.isRequired,
+    myState: PropTypes.object.isRequired,
     onConfirm: PropTypes.func.isRequired,
 };
 
