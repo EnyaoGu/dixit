@@ -26,43 +26,46 @@ exports.Room = class extends colyseus.Room {
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
 
-    this.maxClients = 4;
+    this.maxClients = 2;
     this.cards = new Cards();
   }
 
   onJoin (client, options) {
+    console.log('player joined!', this.roomName, this.roomId, client.id, options);
     const newPlayer = new PlayerState();
+    this.state.players.push(newPlayer);
     newPlayer.id = client.id;
     newPlayer.name = options.name;
     newPlayer.isTeller = this._shouldAssignInitialTeller();
     if (newPlayer.isTeller) {
       newPlayer.hasBeenTellerForTimes = 1;
     }
-    this.state.players.push(newPlayer);
 
-    if(this.clients.length === this.maxClients)
+    if (this.state.players.length === this.maxClients)
     {
       this.cards.deliverCards(this);
-      this.gamePhase = GamePhase.TellerSelectingCard;
+      this.state.gamePhase = GamePhase.TellerSelectingCard;
     }
   }
 
   onMessage (client, message) {
+    console.log('player message', message);
     if (this.locked === false) {
       console.warn('why do we get messages when the room is not locked?'); 
     }
     var currentPlayer = this._getPlayerById(client.id);
 
-    switch (this.state.GamePhase) {
+    switch (this.state.gamePhase) {
       case GamePhase.TellerSelectingCard:
-        this._isMessageValid(true, MessageType.TellerSelectsWord);
-        if (!message.selectedCard || !message.selectedWord) {
+        if (!this._isMessageValid(message, MessageType.TellerSelectsWord, currentPlayer, true)) { break; }
+
+        if (!message.selectedCard || !message.theWord) {
           console.warn('Message invalid.')
-          return;
+          break;
         }
 
-        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) === false) {
-          return;
+        if (!this._SetUsingCardAndSplice(currentPlayer, message.selectedCard)) {
+          break;
         }
         this.state.theWord = message.theWord;
         this.state.gamePhase = GamePhase.PlayersSelectingCards;
@@ -71,15 +74,14 @@ exports.Room = class extends colyseus.Room {
         break;
       
       case GamePhase.PlayersSelectingCards:
-        if (this._isMessageValid(false, MessageType.PlayerSelectsCard) === false){
-          return;
-        }
+        if (!this._isMessageValid(message, MessageType.PlayerSelectsCard, currentPlayer, false)) { break; }
+
         if (!message.selectedCard) {
           console.warn('invalid card selected.');
-          return;
+          break;
         }
-        if (this._SetUsingCardAndSplice(currentPlayer, message.selectedCard) == false) {
-          return;
+        if (!this._SetUsingCardAndSplice(currentPlayer, message.selectedCard)) {
+          break;
         }
 
         // if all players has selected their card.
@@ -89,26 +91,24 @@ exports.Room = class extends colyseus.Room {
         break;
       
       case GamePhase.Voting:
-        // host cannot vote.
-        if (this._isMessageValid(false, MessageType.PlayerVotes) == false){
-          return;
-        }
+        if (!this._isMessageValid(message, MessageType.PlayerVotes, currentPlayer, false)) { break; }
+
         if (!message.votedCard) {
           console.warn('invalid vote.');
-          return;
+          break;
         }
-        if (message.votedCard === currentPlayer.selectedCard) {
+        if (message.votedCard === currentPlayer.usingCard) {
           console.warn('you cannot vote yourself.');
-          return;
+          break;
         }
         currentPlayer.votedCard = message.votedCard;
         // find owner and add voter
         var owner = this._findCardOwnerPlayer(currentPlayer.votedCard);
         owner.voters.push(currentPlayer.id);
 
-        // if all players votes
-        if (this.state.players.some(function (player) {return player.votedCard === undefined;}) === false) {
-          this._scoreCalculator();
+        // if all not-teller players votes
+        if (!this.state.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
+          this.state.gamePhase = GamePhase.GameResult;
           this.state.players.forEach(player => {
             player.isReady = false;
           });
@@ -118,7 +118,8 @@ exports.Room = class extends colyseus.Room {
 
       case GamePhase.GameResult:
         // Now we'll decide whether to start a new round
-        if (this._isMessageValid(undefined, MessageType.ReadyForNextTurn) == false){
+        if (!message.messageType || message.messageType !== MessageType.ReadyForNextTurn) {
+          console.warn('Message type error');
           return;
         }
         currentPlayer.isReady = true;
@@ -155,6 +156,7 @@ exports.Room = class extends colyseus.Room {
     }
     currentPlayer.holdingCards.splice(index, 1);
     currentPlayer.usingCard = selectedCard;
+    return true;
   }
 
   _getPlayerById(clientId)
@@ -165,7 +167,7 @@ exports.Room = class extends colyseus.Room {
   }
 
   _shouldAssignInitialTeller() {
-    return this.clients.length === 1;
+    return this.state.players.length === 1;
   }
 
   _assignRandomTeller(){
@@ -175,15 +177,13 @@ exports.Room = class extends colyseus.Room {
     selectedPlayer.hasBeenTellerForTimes = selectedPlayer.hasBeenTellerForTimes + 1;
   }
 
-  _isMessageValid(shouldBeTeller, expectedMessageType)
-  {
-    if (shouldBeTeller != undefined){
-      if (currentPlayer.isTeller != shouldBeTeller) {
-        console.warn('your role cannot send message now.');
-        return false;
-      }
+  _isMessageValid(message, expectedMessageType, player, shouldBeTeller) {
+    if (player.isTeller !== shouldBeTeller) {
+      console.warn('your role cannot send message now.');
+      return false;
     }
-    if (!message.MessageType || message.MessageType !== expectedMessageType) {
+
+    if (!message.messageType || message.messageType !== expectedMessageType) {
       console.warn('Message type error');
       return false;
     }
