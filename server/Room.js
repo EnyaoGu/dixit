@@ -25,24 +25,34 @@ exports.Room = class extends colyseus.Room {
     this.state.round = 0;
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
+    this.players = [];
+    this._updatePlayerJSONs();
 
     this.maxClients = 4;
     this.cards = new Cards();
   }
 
+  _updatePlayerJSONs() {
+    this.players.forEach((player, index) => {
+      this.state.playerJSONs[index] = JSON.stringify(player);
+    });
+  }
+
   onJoin (client, options) {
     console.log('player joined!', this.roomName, this.roomId, client.id, options);
     const newPlayer = new PlayerState();
-    this.state.players.push(newPlayer);
     newPlayer.id = client.id;
     newPlayer.name = options.name;
+    this.players.push(newPlayer);
     
-    if (this.state.players.length === this.maxClients)
+    if (this.players.length === this.maxClients)
     {
       this._assignNextTeller();
       this.cards.deliverCards(this);
       this.state.gamePhase = GamePhase.TellerSelectingCard;
     }
+
+    this._updatePlayerJSONs();
   }
 
   onMessage (client, message) {
@@ -82,7 +92,7 @@ exports.Room = class extends colyseus.Room {
         }
 
         // All players has selected their card.
-        if (!this.state.players.some(function (player) { return !player.usingCard; })) {
+        if (!this.players.some(function (player) { return !player.usingCard; })) {
           this.state.gamePhase = GamePhase.Voting;
         }
         break;
@@ -102,12 +112,14 @@ exports.Room = class extends colyseus.Room {
         // find owner and add voter
         var owner = this._findCardOwnerPlayer(currentPlayer.votedCard);
         owner.voters.push(currentPlayer.id);
+        this._updatePlayerJSONs();
 
         // All not-teller players votes
-        if (!this.state.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
-          this.state.players.forEach(player => {
+        if (!this.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
+          this.players.forEach(player => {
             player.isReady = false;
           });
+          this._updatePlayerJSONs();
           this._scoreCalculator();
           this.state.gamePhase = GamePhase.GameResult;
         }
@@ -121,7 +133,7 @@ exports.Room = class extends colyseus.Room {
         }
         currentPlayer.isReady = true;
 
-        if (this.state.players.some(function (player) {return player.isReady === false;}) === false){
+        if (!this.players.some(function (player) { return !player.isReady; })){
           this._initNextRound();
         }
         break;
@@ -134,24 +146,24 @@ exports.Room = class extends colyseus.Room {
   onLeave (client, consented) {
     console.log('client left!', this.roomName, this.roomId, client.id);
 
-    const leftPlayerIndex = this.state.players.findIndex((player) => player.id === client.id);
-    this.state.players.splice(leftPlayerIndex, 1);
+    const leftPlayerIndex = this.players.findIndex((player) => player.id === client.id);
+    this.players.splice(leftPlayerIndex, 1);
 
     // Roll back to init state
     this.state.round = 0;
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
-    this.state.players.forEach((player) => {
+    this.players.forEach((player) => {
       player.holdingCards.splice(0, player.holdingCards.length);
       player.voters.splice(0, player.voters.length);
       player.usingCard = '';
       player.votedCard = '';
       player.score = 0;
       player.roundScore = 0;
-      player.isReady = true;
       player.isTeller = false;
       player.hasBeenTellerForTimes = 0;
     });
+    this._updatePlayerJSONs();
     this.cards = new Cards();
   }
 
@@ -169,22 +181,19 @@ exports.Room = class extends colyseus.Room {
     }
     currentPlayer.holdingCards.splice(index, 1);
     currentPlayer.usingCard = selectedCard;
+    this._updatePlayerJSONs();
     return true;
   }
 
   _getPlayerById(clientId)
   {
-    return this.state.players.find(function (player) {
+    return this.players.find(function (player) {
       return player.id === clientId;
     });
   }
 
-  _shouldAssignInitialTeller() {
-    return this.state.players.length === 1;
-  }
-
   _assignNextTeller(){
-    const nextTeller = this.state.players.reduce((tellerCadicate, player) => {
+    const nextTeller = this.players.reduce((tellerCadicate, player) => {
       if (player.hasBeenTellerForTimes < tellerCadicate.hasBeenTellerForTimes) {
         return player;
       }
@@ -192,6 +201,7 @@ exports.Room = class extends colyseus.Room {
     });
 
     nextTeller.isTeller = true;
+    this._updatePlayerJSONs();
   }
 
   _isMessageValid(message, expectedMessageType, player, shouldBeTeller) {
@@ -208,15 +218,15 @@ exports.Room = class extends colyseus.Room {
   }
 
   _findCardOwnerPlayer(card) {
-    return this.state.players.find((player) => player.usingCard === card);
+    return this.players.find((player) => player.usingCard === card);
   }
 
   _scoreCalculator() {
-    var hostIndex = this.state.players.findIndex(function (player){
+    var hostIndex = this.players.findIndex(function (player){
       return player.isTeller === true;
     });
-    var host = this.state.players[hostIndex];
-    var guests = this.state.players.slice();
+    var host = this.players[hostIndex];
+    var guests = this.players.slice();
     guests.splice(hostIndex, 1);
     var hostVote = host.voters.length;
 
@@ -235,26 +245,31 @@ exports.Room = class extends colyseus.Room {
       });
     }
 
-    guests.forEach(function (guest){
+    guests.forEach(function (guest) {
       guest.roundScore += guest.voters.length;
-      });
+    });
+
+    this._updatePlayerJSONs();
   }
 
   _initNextRound() {
-    this.state.round += 1;
+    console.log('start next rount');
+    this.state.round = this.state.round + 1;
     this.state.theWord = '';
-    this.state.players.forEach(player => {
-      player.hasBeenTellerForTimes += player.isTeller ? 1 : 0;
+    this.players.forEach(player => {
+      player.hasBeenTellerForTimes = player.hasBeenTellerForTimes + (player.isTeller ? 1 : 0);
       player.isTeller = false;
-      player.isReady = false;
       player.usingCard = '';
       player.votedCard = '';
-      player.score += player.roundScore;
+      player.score = player.score + player.roundScore;
       player.roundScore = 0;
       player.voters.splice(0, player.voters.length);
     });
+
     this._assignNextTeller();
     this.cards.replenishCard(this);
     this.state.gamePhase = GamePhase.TellerSelectingCard;
+
+    this._updatePlayerJSONs();
   }
 }
