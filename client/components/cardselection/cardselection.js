@@ -19,6 +19,12 @@ const getCardImageUrl = (p_cardName) => {
 const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     const [cardDescription, setCardDescription] = useState('');
     const [cardSelected, setCardSelected] = useState(cards[0]);
+    const [previousPageType, setPreviousPageType] = useState('');
+    const [waitingStatus, setWaitingStatus] = useState(false);
+    if (previousPageType !== pageType) {
+        setWaitingStatus(false);
+        setPreviousPageType(pageType);
+    }
 
     let carouselHeader;
     let carouseButtonText;
@@ -49,15 +55,22 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
 
     return <>
         <div className={'select-cards-wrapper'}>
-            <div>
-                {carouselHeader}
-            </div>
-            <Carousel afterChange={(index) => {
-                setCardSelected(cards[index]);
-            }}
-            >
-                {items}
-            </Carousel>
+            { pageType === PageType.playerPickCard && waitingStatus ?
+                <div></div>
+                :
+                <div>
+                    <div>
+                        {carouselHeader}
+                    </div>
+                    <Carousel afterChange={(index) => {
+                        setCardSelected(cards[index]);
+                    }}
+                    >
+                        {items}
+                    </Carousel>
+                </div>
+            }
+
             <div align={'center'} style={{marginTop:10+'px'}}>
                 { pageType === PageType.tellerEnterDescription ?
                     <div className={'enter-description-wrapper'}>
@@ -81,10 +94,13 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
                     </div>
                     : null
                 }
-                { pageType === PageType.playerPickCard || pageType === PageType.vote ?
+                { (pageType === PageType.playerPickCard || pageType === PageType.vote) && !waitingStatus ?
                     <Button
                         type='primary'
-                        onClick={() => onConfirm(cardSelected, cardDescription)}
+                        onClick={() => {
+                            onConfirm(cardSelected, cardDescription);
+                            setWaitingStatus(true);
+                        }}
                         size='large'
                     >
                         {carouseButtonText}
