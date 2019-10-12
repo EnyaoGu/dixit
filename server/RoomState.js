@@ -9,6 +9,7 @@ class PlayerState extends Schema {
     this.id = '';
     this.name = '';
     this.isTeller = false;
+    this.isReady = true;
     this.holdingCards = new ArraySchema();
     this.voters = new ArraySchema();
     this.usingCard = '';
