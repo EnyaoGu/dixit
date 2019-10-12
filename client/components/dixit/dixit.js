@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './dixit.css'
 import * as Colyseus from "colyseus.js";
 import LOGIN from '../login/login';
@@ -37,6 +37,13 @@ const handleDisconnected = ({ setLogin, setRoom }) => {
 const DIXIT = ({}) => {
   const [room, setRoom] = useState(undefined);
   const [login, setLogin] = useState(true);
+  useEffect(() => {
+    if (!room) { return; }
+
+    const disconnectRoom = () => room.leave();
+    window.addEventListener('beforeunload', disconnectRoom);
+    return () => window.removeEventListener('beforeunload', disconnectRoom);
+  }, [room]);
 
   return <>{
     login
