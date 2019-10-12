@@ -18,6 +18,7 @@ const getCardImageUrl = (p_cardName) => {
 
 const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     const [cardDescription, setCardDescription] = useState('');
+    const [cardSelected, setCardSelected] = useState(cards[0]);
 
     let carouselHeader;
     let carouseButtonText;
@@ -41,7 +42,6 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
         break;
     }
 
-    let cardSelected = cards[0];
     const items = [];
     for (const [index, value] of cards.entries()) {
         items.push(<Card key={index} bordered={false} cover={<img src={getCardImageUrl(value)} />}/>);
@@ -53,7 +53,7 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
                 {carouselHeader}
             </div>
             <Carousel afterChange={(index) => {
-                cardSelected = cards[index];
+                setCardSelected(cards[index]);
             }}
             >
                 {items}
