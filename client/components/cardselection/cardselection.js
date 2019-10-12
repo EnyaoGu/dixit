@@ -36,7 +36,7 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
         carouseButtonText = 'Use this card';
         break;
     case PageType.vote:
-        carouselHeader = <Card bordered={false} ><p>Find the teller's card by the description.</p></Card>;
+        carouselHeader = <Card bordered={false} ><p>Find the teller's card for <b>{theWord}</b>.</p></Card>;
         carouseButtonText = 'Vote';
         break;
     }
