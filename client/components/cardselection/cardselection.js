@@ -6,14 +6,18 @@ import './cardselection.css';
 
 const PageType = Object.freeze({
     tellerEnterDescription: 'teller enter description',
+    tellerWaiting: 'teller wait for player pick and vote',
     playerWaiting: 'player waiting teller to enter description',
     playerPickCard: 'player Pick his card',
     vote: 'vote',
 });
 
-const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
+const getCardImageUrl = (p_cardName) => {
+    return `../../resources/${p_cardName}.png`;
+}
+
+const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     const [cardDescription, setCardDescription] = useState('');
-    const [cardSelected, setCardSelected] = useState('');
 
     let carouselHeader;
     let carouseButtonText;
@@ -21,11 +25,14 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
     case PageType.tellerEnterDescription:
         carouselHeader = <Card bordered={false} ><p>Select one card and enter your description.</p></Card>;
         break;
+    case PageType.tellerWaiting:
+        carouselHeader = <Card bordered={false} ><p>Wait for other players select and vote.</p></Card>;
+        break;
     case PageType.playerWaiting:
         carouselHeader = <Card bordered={false} ><p>Wait for the teller to select card and enter description.</p></Card>;
         break;
     case PageType.playerPickCard:
-        carouselHeader = <Card bordered={false} ><p>Select your card by the description.</p></Card>;
+        carouselHeader = <Card bordered={false} ><p>Select your card for <b>{theWord}</b>.</p></Card>;
         carouseButtonText = 'Use this card';
         break;
     case PageType.vote:
@@ -34,9 +41,10 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
         break;
     }
 
+    let cardSelected = cards[0];
     const items = [];
     for (const [index, value] of cards.entries()) {
-        items.push(<Card key={index} bordered={false} cover={<img src={value} />}/>);
+        items.push(<Card key={index} bordered={false} cover={<img src={getCardImageUrl(value)} />}/>);
     }
 
     return <>
@@ -45,7 +53,7 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
                 {carouselHeader}
             </div>
             <Carousel afterChange={(index) => {
-                setCardSelected(cards[index]);
+                cardSelected = cards[index];
             }}
             >
                 {items}
@@ -60,11 +68,11 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
                             onChange={(e) => {
                                 setCardDescription(e.target.value);
                             }}
-                            onPressEnter={() => onCardSelected(cardSelected, cardDescription)}
+                            onPressEnter={() => onConfirm(cardSelected, cardDescription)}
                         />
                         <Button
                             type='primary'
-                            onClick={() => onCardSelected(cardSelected, cardDescription)}
+                            onClick={() => onConfirm(cardSelected, cardDescription)}
                             size='large'
                             style={{marginLeft:5+'px'}}
                         >
@@ -76,7 +84,7 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
                 { pageType === PageType.playerPickCard || pageType === PageType.vote ?
                     <Button
                         type='primary'
-                        onClick={() => onCardSelected(cardSelected)}
+                        onClick={() => onConfirm(cardSelected, cardDescription)}
                         size='large'
                     >
                         {carouseButtonText}
@@ -91,7 +99,8 @@ const CARDSELECTION = ({ cards, pageType, onCardSelected }) => {
 CARDSELECTION.propTypes = {
     cards: PropTypes.array.isRequired,
     pageType: PropTypes.string.isRequired,
-    onCardSelected: PropTypes.func.isRequired,
+    theWord: PropTypes.string.isRequired,
+    onConfirm: PropTypes.func.isRequired,
 };
 
 export { CARDSELECTION, PageType };
