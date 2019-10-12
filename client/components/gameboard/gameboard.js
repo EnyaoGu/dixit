@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { CARDSELECTION, PageType } from '../cardselection/cardselection';
 import './gameboard.css';
+import { CARDSELECTION, PageType } from '../cardselection/cardselection';
+import RESULT from '../result/result';
+import { getPlayerById } from '../../utilities/common';
+import { Spin } from 'antd';
 
 const noPlayerItem = (key) => <div className='score-item no-player' key={key}>No Player</div>;
 
@@ -118,16 +121,7 @@ const getCards = (pageType, players, myState) => {
   return [];
 }
 
-const fakeGameState = {
-  players: [
-    { id: '1', name: 'Enyao', isTeller: true, score: 12, roundScore: 0 },
-    { id: '2', name: 'John', score: 7, roundScore: 1 },
-    { id: '3', name: '', score: 0, roundScore: 0},
-  ],
-};
-
 const GAMEBOARD = ({ room }) => {
-  // const [ gameState, setGameState ] = useState(fakeGameState);
   const [ gameState, setGameState ] = useState(room.state.toJSON());
   const [ gameStateThrottle, setGameStateThrottle ] = useState(null);
   room.state.onChange = () => {
@@ -140,8 +134,12 @@ const GAMEBOARD = ({ room }) => {
   };
   window.console.log(gameState);
 
+  const [ waiting, setWaiting ] = useState(false);
+  const gamePhase = gameState.gamePhase;
+  useEffect(() => setWaiting(false), [gamePhase]);
+
   const myId = room.sessionId;
-  const myState = gameState.players.find((player) => player.id === myId);
+  const myState = getPlayerById(gameState.players, myId);
 
   const pageType = getPageType(gameState.gamePhase, myState && myState.isTeller);
   const cards = getCards(pageType, gameState.players, myState);
@@ -149,8 +147,19 @@ const GAMEBOARD = ({ room }) => {
   return <div className='gameboard-wrapper'>
     <div id='scoreboard'>{listScoreItems(gameState.players, myId)}</div>
     <div id='content-wrapper'>{
-      gameState.gamePhase === GamePhase.GameResult
-      ? <div></div> // Result page
+      waiting
+      ? <div id='waiting-spin'><Spin /></div>
+      : gameState.gamePhase === GamePhase.GameResult
+      ? <RESULT
+        players={gameState.players}
+        onConfirm={() => {
+          room.send({
+            messageType: MessageType.ReadyForNextTurn,
+          });
+          setWaiting(true);
+        }}
+        theWord={gameState.theWord}
+      />
       : pageType
       ? <CARDSELECTION
           cards={cards}
@@ -165,7 +174,7 @@ const GAMEBOARD = ({ room }) => {
             }
           }}
       />
-      : <div></div> // Waiting for other players join
+      : <div id='waiting-spin'><Spin /></div> // Waiting for other players join
     }</div>
   </div>;
 };

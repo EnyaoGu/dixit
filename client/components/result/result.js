@@ -4,11 +4,18 @@ import 'antd/dist/antd.css';
 import PropTypes from 'prop-types';
 import RESULTITEM from '../resultitem/resultitem'
 import './result.css';
+import { getCardImageUrl, getPlayerById } from '../../utilities/common';
 
-const RESULT = ({ cards }) => {
+const RESULT = ({ players, onConfirm, theWord }) => {
+    const cards = players.map((p_player) => {
+        return {
+            src: getCardImageUrl(p_player.usingCard),
+            voters: p_player.voters.map((p_voter) => getPlayerById(players, p_voter).name),
+        };
+    });
     return <>
         <div>
-            <Card bordered={false} ><p>Description.</p></Card>
+            <Card bordered={false} ><p>{theWord}</p></Card>
         </div>
         <div>
             <div className={'result-item-wrapper'}>
@@ -24,6 +31,7 @@ const RESULT = ({ cards }) => {
             <Button
                 type='primary'
                 size='large'
+                onClick={onConfirm}
             >
                 Next round
             </Button>
@@ -32,7 +40,9 @@ const RESULT = ({ cards }) => {
 };
 
 RESULT.propTypes = {
-    cards: PropTypes.array.isRequired,
+    players: PropTypes.array.isRequired,
+    theWord: PropTypes.string.isRequired,
+    onConfirm: PropTypes.func.isRequired,
 };
 
 export default RESULT;
