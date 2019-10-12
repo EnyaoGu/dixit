@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Card, Carousel, Input, Spin } from 'antd';
 import 'antd/dist/antd.css';
 import PropTypes from 'prop-types';
@@ -46,9 +46,14 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
     }
 
     const items = [];
+    const carouselRef = useRef();
     for (const [index, value] of cards.entries()) {
         items.push(<Card key={index} bordered={false} cover={<img src={getCardImageUrl(value)} />}/>);
     }
+    useEffect(() => {
+        if (carouselRef.current) { carouselRef.current.goTo(0, true); }
+        setCardSelected(cards[0]);
+    }, [cards]);
 
     return <>
         <div className={'select-cards-wrapper'}>
@@ -59,9 +64,11 @@ const CARDSELECTION = ({ cards, pageType, theWord, onConfirm }) => {
                     <div>
                         {carouselHeader}
                     </div>
-                    <Carousel afterChange={(index) => {
-                        setCardSelected(cards[index]);
-                    }}
+                    <Carousel
+                        ref={carouselRef}
+                        afterChange={(index) => {
+                            setCardSelected(cards[index]);
+                        }}
                     >
                         {items}
                     </Carousel>
