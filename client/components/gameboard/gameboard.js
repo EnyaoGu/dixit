@@ -88,7 +88,7 @@ const getCardsOnTable = (players, disorder = false, exception = undefined) => {
   });
 
   const exceptionIndex = orderCards.findIndex((p_card) => p_card === exception);
-  if (exceptionIndex) {
+  if (exceptionIndex >= 0) {
     orderCards.splice(exceptionIndex, 1);
   }
 
