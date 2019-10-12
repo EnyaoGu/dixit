@@ -84,8 +84,8 @@ exports.Room = class extends colyseus.Room {
           break;
         }
 
-        // if all players has selected their card.
-        if (this.state.players.some(function (player) {return player.usingCard == undefined;}) == false) {
+        // All players has selected their card.
+        if (!this.state.players.some(function (player) { return !player.usingCard; })) {
           this.state.gamePhase = GamePhase.Voting;
         }
         break;
@@ -106,7 +106,7 @@ exports.Room = class extends colyseus.Room {
         var owner = this._findCardOwnerPlayer(currentPlayer.votedCard);
         owner.voters.push(currentPlayer.id);
 
-        // if all not-teller players votes
+        // All not-teller players votes
         if (!this.state.players.some(function (player) { return !(player.isTeller || player.votedCard); })) {
           this.state.gamePhase = GamePhase.GameResult;
           this.state.players.forEach(player => {
