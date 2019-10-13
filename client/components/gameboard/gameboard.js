@@ -146,7 +146,6 @@ const GAMEBOARD = ({ room }) => {
 
     setGameState(parseGameState(room.state));
   }, [room]);
-  window.console.log(gameState);
 
   const [ waiting, setWaiting ] = useState(false);
   const gamePhase = gameState.gamePhase;

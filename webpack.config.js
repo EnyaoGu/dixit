@@ -1,10 +1,15 @@
 const path = require("path");
-const webpack = require("webpack");
+// const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
-module.exports = {
+module.exports = function (env = '') {
+  return {
   entry: "./client/index.js",
-  mode: "development",
+    mode: env === 'prod' ? 'production' : 'development',
   module: {
     rules: [
       {
@@ -31,11 +36,39 @@ module.exports = {
     port: 2048,
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+      new CleanWebpackPlugin({
+        cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, 'dist', '*')],
+      }),
+      new CopyWebpackPlugin([
+        {
+          from: path.resolve(__dirname, 'client', 'resources'),
+          to: path.join(__dirname, 'dist', 'resources'),
+          cache: true,
+        },
+      ]),
+      // new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'client', 'index.html'),
       filename: path.resolve(__dirname, 'dist', 'index.html'),
       inject: 'head',
     }),
-  ]
+    ],
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          commons: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'assets',
+            chunks: 'all',
+          },
+        },
+      },
+      minimizer: env === 'prod' ? [
+        new UglifyJsPlugin({
+          parallel: true,
+        }),
+        new OptimizeCSSAssetsPlugin({}),
+      ] : undefined,
+    },
 };
+}

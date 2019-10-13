@@ -1,5 +1,5 @@
 export const getCardImageUrl = (p_cardName) => {
-    return `../../resources/${p_cardName}.png`;
+    return `/resources/${p_cardName}.png`;
 }
 
 export const getPlayerById = (p_players, p_id) => {

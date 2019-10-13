@@ -5,13 +5,15 @@
   "scripts": {
     "start:back": "node server/index.js",
     "start:front": "npx webpack-dev-server",
+    "build": "npx webpack --env prod",
     "loadtest": "colyseus-loadtest loadtest/example.js --room my_room --numClients 2",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@colyseus/loadtest": "^0.11.0",
+    "antd": "^3.23.6",
     "babel-loader": "^8.0.2",
-    "copy-webpack-plugin": "^4.5.1",
+    "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^1.0.0",
     "html-webpack-plugin": "^3.1.0",
     "react": "^16.10.2",
@@ -20,8 +22,7 @@
     "style-loader": "^0.20.3",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
-    "webpack-dev-server": "^3.1.9",
-    "antd": "^3.23.6"
+    "webpack-dev-server": "^3.1.9"
   },
   "dependencies": {
     "@babel/cli": "7.1.0",
@@ -31,11 +32,14 @@
     "@babel/preset-react": "^7.0.0-rc.1",
     "@colyseus/monitor": "^0.11.0",
     "@colyseus/social": "^0.10.2",
+    "clean-webpack-plugin": "^3.0.0",
     "colyseus": "^0.11.0",
     "colyseus.js": "^0.11.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "express-jwt": "^5.3.1"
+    "express-jwt": "^5.3.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "uglifyjs-webpack-plugin": "^2.2.0"
   },
   "private": true
 }
