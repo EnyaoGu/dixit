@@ -7,7 +7,7 @@
     "start:front": "npx webpack-dev-server",
     "build": "npx webpack --env prod",
     "pm2-start": "pm2 start ecosystem.config.js",
-    "pm2-stop": "pm2 start ecosystem.config.js",
+    "pm2-stop": "pm2 delete ecosystem.config.js",
     "loadtest": "colyseus-loadtest loadtest/example.js --room my_room --numClients 2",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
