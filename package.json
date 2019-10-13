@@ -6,6 +6,8 @@
     "start:back": "node server/index.js",
     "start:front": "npx webpack-dev-server",
     "build": "npx webpack --env prod",
+    "pm2-start": "pm2 start ecosystem.config.js",
+    "pm2-stop": "pm2 start ecosystem.config.js",
     "loadtest": "colyseus-loadtest loadtest/example.js --room my_room --numClients 2",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -38,6 +40,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-jwt": "^5.3.1",
+    "http-server": "^0.11.1",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "uglifyjs-webpack-plugin": "^2.2.0"
   },
