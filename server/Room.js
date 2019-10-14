@@ -37,7 +37,9 @@ exports.Room = class extends colyseus.Room {
       this.disconnect();
       return;
     }
-    this.metadata.roomNumber = roomNumber;
+    this.setMetadata({
+      roomNumber,
+    });
 
     this.setState(new RoomState());
     this.state.round = 0;
