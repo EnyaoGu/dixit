@@ -7,7 +7,7 @@ npm install yarn -g
 yarn install
 ```
 
-## Start
+## Start dev server
 Two servers are needed: one for frontend content distribution:
 ```bash
 npm run start:front
@@ -18,6 +18,21 @@ And one for backend game server:
 npm run start:back
 ```
 
+## Start/stop prod server
+Install tools
+```bash
+npm install pm2 -g
+```
+
+Start server. Both the client content distribution server and the backend server will be hosted by pm2.
+```bash
+npm run pm2-start
+```
+
+Stop server
+```bash
+npm run pm2-stop
+```
 
 ## Note
 
@@ -39,7 +54,7 @@ RoomState:
     this.state = this.setState({
       round: -1,
       gamePhase: GamePhase.Boarding,
-      players: [{
+      players: [JSON.stringfy({
         id: 'string',
         name: 'string',
         isTeller: 'boolean', 
@@ -50,7 +65,7 @@ RoomState:
         score: 'number',
         roundScore: 'number',
         isReady: 'boolean',
-      }],
+      })],
       theWord,
     })
 }
@@ -58,9 +73,10 @@ RoomState:
 
 Message from client to server
 ```js
-msg = {
-    string messageType = Room.MessageType.xxx,
-    string selectedCard = Cards.CardIds.xxx,
-    string theWord = "the word"};
-    string votedCard = Cards.CardIds.xxx}
+{
+  messageType = 'string',
+  selectedCard? = 'string',
+  votedCard? = 'string',
+  theWord? = 'string',
+};
 ```
