@@ -19,10 +19,6 @@ const CARDSELECTION = ({ cards, pageType, theWord, myState, onConfirm }) => {
     const [previousPageType, setPreviousPageType] = useState('');
     const [waitingStatus, setWaitingStatus] = useState(false);
     const previousType = previousPageType;
-    if (previousPageType !== pageType) {
-        setWaitingStatus(false);
-        setPreviousPageType(pageType);
-    }
 
     let carouselHeader;
     let carouseButtonText;
@@ -54,12 +50,13 @@ const CARDSELECTION = ({ cards, pageType, theWord, myState, onConfirm }) => {
         items.push(<Card key={index} bordered={false} cover={<img src={getCardImageUrl(value)} />}/>);
     }
     useEffect(() => {
-        if (previousType === pageType || previousType === PageType.tellerEnterDescription && pageType === PageType.playerPickCard) {
-           return;
+        setWaitingStatus(false);
+        if (!(previousType === PageType.playerWaiting && pageType === PageType.playerPickCard)) {
+            if (carouselRef.current) { carouselRef.current.goTo(0, true); }
+            setCardSelected(cards[0]);
         }
-        if (carouselRef.current) { carouselRef.current.goTo(0, true); }
-        setCardSelected(cards[0]);
-    }, [cards]);
+        setPreviousPageType(pageType);
+    }, [pageType]);
 
     return <>
         <div className={'select-cards-wrapper'}>

@@ -132,6 +132,7 @@ const parseGameState = (roomState) => {
 
 const GAMEBOARD = ({ room }) => {
   const [ gameState, setGameState ] = useState(parseGameState(room.state));
+  const [ previousCards, setPreviousCards ] = useState([]);
 
   const [ gameStateThrottle, setGameStateThrottle ] = useState(null);
   useEffect(() => {
@@ -155,7 +156,13 @@ const GAMEBOARD = ({ room }) => {
   const myState = getPlayerById(gameState.players, myId);
 
   const pageType = getPageType(gameState.gamePhase, myState && myState.isTeller);
-  const cards = getCards(pageType, gameState.players, myState);
+  let cards = getCards(pageType, gameState.players, myState);
+  if (gameState.gamePhase === GamePhase.Voting && cards.length === previousCards.length) {
+    cards = previousCards;
+  }
+  if (JSON.stringify(cards) !== JSON.stringify(previousCards)) {
+    setPreviousCards(cards);
+  }
 
   return <div className='gameboard-wrapper'>
     <div id='scoreboard'>{listScoreItems(gameState.players, myId)}</div>
