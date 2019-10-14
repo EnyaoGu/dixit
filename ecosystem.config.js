@@ -17,7 +17,7 @@ module.exports = {
 		{
 			name: 'page-server',
 			script: './node_modules/http-server/bin/http-server',
-			args: './dist/ -p 2048',
+			args: './dist/ -p 2048 -c120',
 			node_args: ['--max-old-space-size=1024'], // 1 gb limit
 			env: {
 				NODE_ENV: 'production',
