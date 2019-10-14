@@ -1,4 +1,4 @@
-.waiting-spin-overlay {
+.waiting-spin-overlay, .error-overlay {
 	height: 100%;
 	width: 100%;
 	display: flex;

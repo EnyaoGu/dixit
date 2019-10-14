@@ -12,6 +12,6 @@
 	margin-bottom: 10px;
 }
 
-.login-wrapper button {
+.login-wrapper #button-row > *:not(:first-child) {
 	margin-left: 20px;
 }
