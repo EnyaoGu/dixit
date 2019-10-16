@@ -26,6 +26,7 @@ class RoomState extends Schema {
   }
 }
 schema.defineTypes(RoomState, {
+  roomNumber: 'string',
   round: 'number',
   gamePhase: 'string',
   playerJSONs: [ 'string' ],

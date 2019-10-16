@@ -10,7 +10,7 @@ const RESULTITEM = ({ card }) => {
 	);
 
     return <>
-        <Card style={{ width: 140, backgroundColor: 'lightcyan'}} bordered={false} cover={<img src={card.src} style={{ width: 108 }}/>}>
+        <Card style={{ width: 140 }} bordered={false} cover={<img src={card.src} style={{ width: 108 }}/>}>
             <ul>
                 {items}
             </ul>

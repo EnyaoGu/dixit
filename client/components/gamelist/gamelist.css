@@ -1,0 +1,60 @@
+.game-list-wrapper {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.game-list-wrapper #user-name {
+	flex-basis: 40px;
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+	padding: 8px 0;
+}
+
+.game-list-wrapper #list {
+	flex: 1 1 auto;
+}
+
+.game-list-wrapper #list #refreashing-overlay {
+	display: none;
+}
+
+.game-list-wrapper #list.refreshing {
+	position: relative;
+	opacity: 0.6;
+}
+
+.game-list-wrapper #list.refreshing #refreashing-overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.game-list-wrapper #list-header {
+	width: 240px;
+	display: inline-flex;
+	justify-content: space-between
+}
+
+.game-list-wrapper #list .room-info {
+	width: 200px;
+	display: inline-flex;
+	justify-content: space-between
+}
+
+.game-list-wrapper #buttons {
+	flex-basis: 60px;
+}
+
+.game-list-wrapper #buttons *:not(:first-child) {
+	margin-left:20px;
+}

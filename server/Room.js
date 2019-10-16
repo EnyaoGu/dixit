@@ -18,10 +18,31 @@ const MessageType = {
    ReadyForNextTurn : 'ReadyForNextTurn',
 }
 
+const roomNumberPool = [];
+for (let number = 0; number < 10000; number += 1) {
+  roomNumberPool.push(new String(Math.floor(number)).padStart(4, '0'));
+}
+
+const pickOutRoomNumberFromPool = () => {
+  if (!roomNumberPool.length) { return null; }
+  const index = Math.floor(Math.random() * roomNumberPool.length);
+  return roomNumberPool.splice(index, 1)[0];
+};
+
 exports.Room = class extends colyseus.Room {
   onCreate (options) {
-    console.log('room created!', this.roomName, this.roomId, options);
+    const roomNumber = pickOutRoomNumberFromPool();
+    if (!roomNumber) {
+      console.log('can not create room since server out of room number');
+      this.disconnect();
+      return;
+    }
+    this.setMetadata({
+      roomNumber,
+    });
+
     this.setState(new RoomState());
+    this.state.roomNumber = roomNumber;
     this.state.round = 0;
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
@@ -30,6 +51,8 @@ exports.Room = class extends colyseus.Room {
 
     this.maxClients = 4;
     this.cards = new Cards();
+
+    console.log('room created!', this.roomName, this.roomId, roomNumber, options);
   }
 
   _updatePlayerJSONs() {
@@ -187,7 +210,10 @@ exports.Room = class extends colyseus.Room {
   }
 
   onDispose() {
-    console.log('room dispose!', this.roomName, this.roomId);
+    console.log('room dispose!', this.roomName, this.roomId, this.metadata.roomNumber);
+
+    // Return back the roomNumber into pool
+    roomNumberPool.push(this.metadata.roomNumber);
   }
 
   _SetUsingCardAndSplice(currentPlayer, selectedCard)
