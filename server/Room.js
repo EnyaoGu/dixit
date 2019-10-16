@@ -42,6 +42,7 @@ exports.Room = class extends colyseus.Room {
     });
 
     this.setState(new RoomState());
+    this.state.roomNumber = roomNumber;
     this.state.round = 0;
     this.state.gamePhase = GamePhase.Boarding;
     this.state.theWord = '';
@@ -209,10 +210,10 @@ exports.Room = class extends colyseus.Room {
   }
 
   onDispose() {
-    console.log('room dispose!', this.roomName, this.roomId);
+    console.log('room dispose!', this.roomName, this.roomId, this.metadata.roomNumber);
 
     // Return back the roomNumber into pool
-    pickOutRoomNumberFromPool.push(this.metadata.roomNumber);
+    roomNumberPool.push(this.metadata.roomNumber);
   }
 
   _SetUsingCardAndSplice(currentPlayer, selectedCard)

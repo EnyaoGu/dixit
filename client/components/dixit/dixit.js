@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './dixit.css'
 import * as Colyseus from "colyseus.js";
 import LOGIN, { confirmTypes } from '../login/login';
+import GAMELIST from '../gamelist/gamelist';
 import GAMEBOARD from '../gameboard/gameboard';
 import { Spin } from 'antd';
 
@@ -25,8 +26,8 @@ const handleConnected = (p_room, { setPage, setRoom }) => {
   p_room.onLeave((p_code) => {
     if (p_code > 1000) {
       // Unexpected disconnect
-      setRoom(undefined);
       setPage(pageTypes.waiting);
+      setRoom(undefined);
   
       client.reconnect(p_room.id, p_room.sessionId)
         .then((p_room) => handleConnected(p_room, { setPage, setRoom }))
@@ -38,8 +39,8 @@ const handleConnected = (p_room, { setPage, setRoom }) => {
 };
 
 const handleDisconnected = ({ setPage, setRoom }) => {
-  setRoom(undefined);
   setPage(pageTypes.login);
+  setRoom(undefined);
 };
 
 const DIXIT = ({}) => {
@@ -54,7 +55,7 @@ const DIXIT = ({}) => {
     return () => window.removeEventListener('beforeunload', disconnectRoom);
   }, [room]);
 
-  return <>{
+  return <div className={`dixit-wrapper ${page === pageTypes.login ? 'login' : ''}`} >{
     page === pageTypes.login
     ? <LOGIN
       onConfirm={(p_confirmType, p_userName) => {
@@ -75,15 +76,16 @@ const DIXIT = ({}) => {
     />
     : page === pageTypes.gameList
     ? <GAMELIST
-      gameRoomList={client.getAvailableRooms()}
+      listGetter={() => client.getAvailableRooms()}
       userName={userName}
       onConfirm={(p_roomId) => {
         setPage(pageTypes.waiting);
 
-        client.joinById(p_roomId, { name: p_userName })
+        client.joinById(p_roomId, { name: userName })
           .then((p_room) => handleConnected(p_room, { setPage, setRoom }))
           .catch(() => handleDisconnected({ setPage, setRoom }));
       }}
+      onCancel={() => setPage(pageTypes.login)}
     />
     : page === pageTypes.gaming
     ? <GAMEBOARD
@@ -92,7 +94,7 @@ const DIXIT = ({}) => {
     : page === pageTypes.waiting
     ? <div className='waiting-spin-overlay'><Spin /></div>
     : <div className='error-overlay'>Error. Please refresh the page</div>
-  }</>;
+  }</div>;
 };
 
 DIXIT.propTypes = {};

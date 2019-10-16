@@ -168,7 +168,7 @@ const GAMEBOARD = ({ room }) => {
     <div id='scoreboard'>{listScoreItems(gameState.players, myId)}</div>
     <div id='content-wrapper'>{
       waiting
-      ? <div id='waiting-spin'><Spin /></div>
+      ? <div className='waiting-spin'><Spin /></div>
       : gameState.gamePhase === GamePhase.GameResult
       ? <RESULT
         players={gameState.players}
@@ -195,7 +195,11 @@ const GAMEBOARD = ({ room }) => {
             }
           }}
       />
-      : <div id='waiting-spin'><Spin /></div> // Waiting for other players join
+      : <div className='waiting-player'>
+        <span>Room number</span>
+        <span id='room-number'>{gameState.roomNumber}</span>
+        <span>wait other players to join</span>
+      </div> // Waiting for other players join
     }</div>
   </div>;
 };
