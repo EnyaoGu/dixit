@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "For innovation day",
   "scripts": {
-    "start:back": "node server/index.js",
-    "start:front": "npx webpack-dev-server",
+    "start": "node server/index.js",
+    "dev": "npx webpack --env watch",
     "build": "npx webpack --env prod",
     "pm2-start": "pm2 start ecosystem.config.js",
     "pm2-stop": "pm2 delete ecosystem.config.js",

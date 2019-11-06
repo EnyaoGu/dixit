@@ -5,7 +5,7 @@ module.exports = {
 	 */
 	apps: [
 		{
-			name: 'game-server',
+			name: 'dixit-server',
 			script: './server/index.js',
 			node_args: ['--max-old-space-size=1024'], // 1 gb limit
 			env: {
@@ -13,17 +13,6 @@ module.exports = {
 			},
 			out_file: './logs/game-server.log',
 			error_file: './logs/game-server.log',
-		},
-		{
-			name: 'page-server',
-			script: './node_modules/http-server/bin/http-server',
-			args: './dist/ -p 2048 -c120',
-			node_args: ['--max-old-space-size=1024'], // 1 gb limit
-			env: {
-				NODE_ENV: 'production',
-			},
-			out_file: './logs/page-server.log',
-			error_file: './logs/page-server.log',
 		},
 	],
 };

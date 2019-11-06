@@ -5,8 +5,9 @@ import LOGIN, { confirmTypes } from '../login/login';
 import GAMELIST from '../gamelist/gamelist';
 import GAMEBOARD from '../gameboard/gameboard';
 import { Spin } from 'antd';
+import { gamePort } from '../../utilities/constants';
 
-const client = new Colyseus.Client(`ws://${document.location.hostname}:2052`);
+const client = new Colyseus.Client(`ws://${document.location.hostname}:${gamePort}`);
 window.client = client;
 
 const pageTypes = Object.freeze({

@@ -3,20 +3,28 @@ const express = require('express');
 const cors = require('cors');
 const colyseus = require('colyseus');
 const { Room } = require('./Room');
+const config = require('./config');
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+// Start client distribution
+const distribution = express();
+distribution.use('/', express.static(`${__dirname}/../dist`));
+distribution.all('/', (req, res) => res.redirect('/index.html'))
 
-const server = http.createServer(app);
+distribution.listen(config.distPort);
+console.log(`Client distribution listens on port:${config.distPort}`);
+
+// Start game server
+const game = express();
+game.use(cors());
+game.use(express.json());
+
 const gameServer = new colyseus.Server({
-  server: server,
-  express: app,
+  server: http.createServer(game),
+  express: game,
 });
 
-// register room handlers
+// Register room handlers
 gameServer.define('room', Room);
 
-const port = process.env.PORT || 2052;
-gameServer.listen(port);
-console.log(`Listening on ws://localhost:${port}`)
+gameServer.listen(config.gamePort);
+console.log(`Game server listens on port:${config.gamePort}`);
