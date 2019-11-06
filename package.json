@@ -1,7 +1,7 @@
 {
   "name": "dixit",
   "version": "0.1.0",
-  "description": "For innovation day",
+  "description": "For NISH innovation day 2019",
   "scripts": {
     "start": "node server/index.js",
     "dev": "npx webpack --env watch",
