@@ -1,0 +1,3 @@
+[submodule "client/egy-react-controls"]
+	path = client/egy-react-controls
+	url = https://github.com/EnyaoGu/egy-react-controls.git
